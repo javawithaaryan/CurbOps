@@ -14,7 +14,16 @@ export default function Dashboard() {
 
         <div className="p-6">
 
-          Dashboard Content
+         <h1>Operational Intelligence</h1>
+
+<p>
+Monitoring parking-induced congestion across Bengaluru.
+</p>
+
+<p>
+Priority enforcement recommendations will appear here.
+</p>
+
 
         </div>
 
