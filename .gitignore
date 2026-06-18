@@ -1,0 +1,22 @@
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Large Datasets (Do NOT push to GitHub)
+dataset/*.csv
+dataset/jan*
+*.csv
+mmi_cache.json
+
+# IDEs
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
