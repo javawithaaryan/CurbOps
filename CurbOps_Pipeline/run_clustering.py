@@ -292,11 +292,18 @@ def compute_zone_metrics(df: pd.DataFrame) -> list[dict]:
         ]
 
         # ── Top violation types (top 3 by frequency) ────────────────────
+        import ast
         violtype_counts = grp["violation_type"].value_counts().head(3)
-        top_violation_types = [
-            {"type": str(vt), "count": int(cnt)}
-            for vt, cnt in violtype_counts.items()
-        ]
+        top_violation_types = []
+        for vt, cnt in violtype_counts.items():
+            vt_str = str(vt)
+            try:
+                parsed = ast.literal_eval(vt_str)
+                if isinstance(parsed, list):
+                    vt_str = ", ".join(str(x) for x in parsed)
+            except Exception:
+                pass
+            top_violation_types.append({"type": vt_str, "count": int(cnt)})
 
         # ── Centroid (mean lat/lon in degrees) ──────────────────────────
         centroid_lat = float(grp["latitude"].mean())
