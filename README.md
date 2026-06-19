@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # 🚀 CurbOps: Parking Enforcement Intelligence
 
 > **Gridlock 2.0 Hackathon** | Backend & Spatial Clustering Pipeline
@@ -97,9 +97,6 @@ The files in the `dataset/` folder are 100% ready for your Streamlit application
 3. **Data Quality Filter:** Use the `low_confidence` boolean to let users toggle off zones that have fewer than 5 violations.
 4. **Patrol Recommendations:** Highlight the `recommended_window` property—this tells the police exactly what hour they need to be at that zone.
 
----
-
-*Built with ❤️ by the CurbOps Team for Gridlock 2.0*
 =======
 ## 💻 Tech Stack Overview
 
