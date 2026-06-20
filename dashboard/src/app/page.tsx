@@ -1,0 +1,191 @@
+'use client';
+
+// ---------------------------------------------------------------------------
+// CausaFlow AI — BTP Command Centre
+// Main dashboard page. Orchestrates state, data fetching, view switching,
+// and the "Simulate Optimized Enforcement" killer toggle.
+// ---------------------------------------------------------------------------
+
+import { useEffect, useMemo, useState } from 'react';
+import dynamic from 'next/dynamic';
+import Sidebar from '@/components/dashboard/Sidebar';
+import TopBar from '@/components/dashboard/TopBar';
+import DrillDownPanel from '@/components/dashboard/DrillDownPanel';
+import PriorityTable from '@/components/dashboard/PriorityTable';
+import { DEPLOYABLE_TIERS } from '@/lib/dashboard/tiers';
+import type { CityStats, Zone } from '@/lib/dashboard/types';
+
+// Leaflet must only render on the client.
+const MapView = dynamic(() => import('@/components/dashboard/MapView'), {
+  ssr: false,
+  loading: () => (
+    <div className="absolute inset-0 flex items-center justify-center bg-[#0b1220]">
+      <div className="text-slate-400 font-mono text-xs">Loading map…</div>
+    </div>
+  ),
+});
+
+export default function Home() {
+  const [zones, setZones] = useState<Zone[]>([]);
+  const [stats, setStats] = useState<CityStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const [view, setView] = useState<'map' | 'table'>('map');
+  const [selectedZone, setSelectedZone] = useState<Zone | null>(null);
+  const [hideLowConfidence, setHideLowConfidence] = useState(false);
+  const [simulate, setSimulate] = useState(false);
+  const [stationFilter, setStationFilter] = useState('ALL');
+  const [flyToZone, setFlyToZone] = useState<{ lat: number; lon: number; radius_m: number } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [zRes, sRes] = await Promise.all([fetch('/api/zones'), fetch('/api/stats')]);
+        if (!zRes.ok || !sRes.ok) throw new Error('API request failed');
+        const [z, s] = await Promise.all([zRes.json() as Promise<Zone[]>, sRes.json() as Promise<CityStats>]);
+        if (cancelled) return;
+        setZones(z);
+        setStats(s);
+        setLoading(false);
+      } catch (e) {
+        if (cancelled) return;
+        setError(e instanceof Error ? e.message : 'Failed to load zones');
+        setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Zones now carry their `action_tier` directly from the dataset, so no
+  // client-side tier computation is needed. We just memoize for stability.
+  const annotatedZones = useMemo(() => zones, [zones]);
+
+  const filteredZones = useMemo(() => {
+    let out = annotatedZones;
+    if (hideLowConfidence) out = out.filter((z) => !z.low_confidence);
+    if (stationFilter !== 'ALL') out = out.filter((z) => z.police_station === stationFilter);
+    return out;
+  }, [annotatedZones, hideLowConfidence, stationFilter]);
+
+  // Deployable zones = TOW + PATROL (the ones that get active enforcement
+  // capacity in the Simulate-Optimized-Enforcement scenario). Used to compute
+  // the recovered-CBM counter.
+  const deployableZones = useMemo(
+    () => annotatedZones.filter((z) => DEPLOYABLE_TIERS.includes(z.action_tier)),
+    [annotatedZones]
+  );
+
+  // In Simulate mode we keep ALL filtered zones on the map (MONITOR zones fade
+  // via reduced fillOpacity inside MapView, while TOW/PATROL get halos). This
+  // matches the spec: MONITOR zones are still visible but pushed into the
+  // background, instead of being removed entirely.
+  const visibleZones = simulate ? filteredZones : filteredZones;
+
+  const totalCBM = useMemo(() => zones.reduce((s, z) => s + (z.zone_CBM_sum || 0), 0), [zones]);
+  const deployableCBM = useMemo(
+    () => deployableZones.reduce((s, z) => s + (z.zone_CBM_sum || 0), 0),
+    [deployableZones]
+  );
+  const recoveredCBM = deployableCBM * 0.4;
+
+  // -------------------------------------------------------------------
+  // When the police-station filter changes, fly the map to the
+  // highest-CBM zone in that station's jurisdiction so the user
+  // immediately sees the relevant area.
+  // -------------------------------------------------------------------
+  useEffect(() => {
+    if (stationFilter === 'ALL') return;
+    // Find the highest-CBM zone for this station (annotatedZones is sorted
+    // by CBM desc in the source dataset, so the first match is the worst).
+    const target = annotatedZones.find((z) => z.police_station === stationFilter);
+    if (!target) return;
+    setFlyToZone({
+      lat: target.centroid_lat,
+      lon: target.centroid_lon,
+      radius_m: target.radius_m,
+    });
+  }, [stationFilter, annotatedZones]);
+
+  const handleSelectFromTable = (zone: Zone) => {
+    setSelectedZone(zone);
+    setView('map');
+    setFlyToZone({ lat: zone.centroid_lat, lon: zone.centroid_lon, radius_m: zone.radius_m });
+  };
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-[#f8fafc]">
+        <div className="text-center">
+          <div className="inline-block w-12 h-12 border-2 border-[#3b82f6] border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="text-slate-500 font-mono text-sm">Initialising CausaFlow command deck…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-screen w-screen flex items-center justify-center bg-[#f8fafc]">
+        <div className="text-center max-w-md">
+          <div className="text-[#dc2626] text-4xl mb-3">⚠</div>
+          <p className="text-slate-800 font-semibold mb-1">API unreachable</p>
+          <p className="text-slate-500 text-sm font-mono">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen w-screen flex bg-[#f8fafc] overflow-hidden">
+      <Sidebar
+        totalCBM={totalCBM}
+        totalZones={zones.length}
+        totalViolations={stats?.total_violations ?? zones.reduce((s, z) => s + (z.violation_count || 0), 0)}
+        recoveredCBM={recoveredCBM}
+        simulate={simulate}
+        hideLowConfidence={hideLowConfidence}
+        setHideLowConfidence={setHideLowConfidence}
+        setSimulate={setSimulate}
+        stationFilter={stationFilter}
+        setStationFilter={setStationFilter}
+        stations={stats?.police_stations ?? []}
+        view={view}
+        setView={setView}
+        visibleCount={visibleZones.length}
+      />
+
+      <main className="flex-1 flex flex-col min-w-0">
+        <TopBar
+          simulate={simulate}
+          visibleCount={visibleZones.length}
+          totalCount={zones.length}
+          view={view}
+          stationFilter={stationFilter}
+        />
+
+        <div className="flex-1 relative min-h-0">
+          {view === 'map' ? (
+            <>
+              <MapView
+                zones={visibleZones}
+                simulate={simulate}
+                onSelect={setSelectedZone}
+                selectedZone={selectedZone}
+                flyToZone={flyToZone}
+              />
+              {selectedZone && (
+                <DrillDownPanel zone={selectedZone} onClose={() => setSelectedZone(null)} simulate={simulate} />
+              )}
+            </>
+          ) : (
+            <PriorityTable zones={filteredZones} onRowClick={handleSelectFromTable} stationFilter={stationFilter} />
+          )}
+        </div>
+      </main>
+    </div>
+  );
+}

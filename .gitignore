@@ -28,3 +28,8 @@ secrets.txt
 
 # Frontend
 node_modules/
+.next/
+
+# Archives
+*.zip
+dashboard_an/
