@@ -1,5 +1,0 @@
-loading
-
-error
-
-zones

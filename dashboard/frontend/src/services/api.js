@@ -1,3 +1,0 @@
-getZones()
-
-getGeoJSON()
