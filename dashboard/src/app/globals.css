@@ -122,7 +122,7 @@
 }
 
 /* =========================================================================
-   CausaFlow AI — BTP Command Centre custom styles
+   CurbOps — BTP Command Centre custom styles
    Appended on top of shadcn/ui defaults.
    ========================================================================= */
 
@@ -275,17 +275,18 @@ body {
   border: 1px solid rgba(59, 130, 246, 0.2) !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
 }
-.leaflet-tooltip.causaflow-tooltip {
-  background: rgba(15, 23, 42, 0.95);
-  color: #e2e8f0;
-  border: 1px solid rgba(59, 130, 246, 0.4);
-  border-radius: 8px;
-  font-size: 11px;
-  font-family: 'Inter', system-ui, sans-serif;
-  padding: 8px 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+.leaflet-tooltip.curbops-tooltip {
+  background-color: rgba(15, 23, 42, 0.95); /* slate-900 */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.375rem; /* rounded-md */
+  padding: 0.5rem 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  color: white;
+  pointer-events: none;
 }
-.leaflet-tooltip.causaflow-tooltip::before { display: none; }
+/* Hide the default Leaflet tooltip arrow */
+.leaflet-tooltip.curbops-tooltip::before { display: none; }
 .leaflet-control-attribution {
   background: rgba(11, 18, 32, 0.85) !important;
   color: #64748b !important;
@@ -363,204 +364,3 @@ tr.row-watch:hover { background: rgba(234, 179, 8, 0.10); }
   z-index: 500;
   pointer-events: none;
 }
-
-/* ===========================================================================
-   Map place-search (MapSearch + dropdown + result pin)
-   Sits top-left of the map, above Leaflet's zoom/attribution controls.
-   =========================================================================== */
-.map-search-slot {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  z-index: 600;
-  width: 320px;
-  max-width: calc(100vw - 40px);
-}
-
-.map-search-wrap {
-  position: relative;
-  width: 100%;
-}
-
-.map-search-input-row {
-  position: relative;
-  display: flex;
-  align-items: center;
-  background: rgba(15, 23, 42, 0.82);
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-  border: 1px solid rgba(59, 130, 246, 0.22);
-  border-radius: 8px;
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-}
-.map-search-input-row:focus-within {
-  border-color: rgba(34, 211, 238, 0.65);
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.45), 0 0 0 3px rgba(34, 211, 238, 0.12);
-}
-
-.map-search-icon {
-  position: absolute;
-  left: 11px;
-  width: 15px;
-  height: 15px;
-  color: #64748b;
-  pointer-events: none;
-}
-.map-search-input-row:focus-within .map-search-icon {
-  color: #22d3ee;
-}
-
-.map-search-input {
-  width: 100%;
-  background: transparent;
-  border: 0;
-  outline: none;
-  color: #e2e8f0;
-  font-size: 12px;
-  font-family: 'Inter', system-ui, sans-serif;
-  padding: 9px 30px 9px 32px;
-}
-.map-search-input::placeholder {
-  color: #5b6473;
-}
-
-.map-search-clear {
-  position: absolute;
-  right: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border: 0;
-  border-radius: 4px;
-  background: rgba(148, 163, 184, 0.16);
-  color: #94a3b8;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-.map-search-clear:hover {
-  background: rgba(148, 163, 184, 0.28);
-  color: #e2e8f0;
-}
-
-.map-search-spinner {
-  position: absolute;
-  right: 34px;
-  width: 13px;
-  height: 13px;
-  border: 2px solid rgba(148, 163, 184, 0.3);
-  border-top-color: #22d3ee;
-  border-radius: 50%;
-  animation: map-search-spin 0.7s linear infinite;
-}
-@keyframes map-search-spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Dropdown list */
-.map-search-list {
-  list-style: none;
-  margin: 6px 0 0;
-  padding: 4px;
-  background: rgba(11, 18, 32, 0.96);
-  backdrop-filter: blur(14px) saturate(180%);
-  -webkit-backdrop-filter: blur(14px) saturate(180%);
-  border: 1px solid rgba(59, 130, 246, 0.22);
-  border-radius: 8px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-  max-height: 320px;
-  overflow-y: auto;
-}
-
-.map-search-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 7px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.12s ease;
-}
-.map-search-item.active {
-  background: rgba(34, 211, 238, 0.12);
-}
-.map-search-item:hover {
-  background: rgba(59, 130, 246, 0.16);
-}
-
-.map-search-pin {
-  flex-shrink: 0;
-  margin-top: 1px;
-  color: #22d3ee;
-}
-.map-search-item.active .map-search-pin {
-  color: #67e8f9;
-}
-
-.map-search-text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-.map-search-label {
-  font-size: 12px;
-  font-family: 'Inter', system-ui, sans-serif;
-  color: #e2e8f0;
-  line-height: 1.25;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.map-search-detail {
-  margin-top: 1px;
-  font-size: 10px;
-  font-family: 'Inter', system-ui, sans-serif;
-  color: #7c89a0;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.map-search-empty {
-  padding: 10px 10px;
-  font-size: 11px;
-  font-family: 'Inter', system-ui, sans-serif;
-  color: #7c89a0;
-}
-.map-search-error {
-  color: #fca5a5;
-}
-
-/* Search-result pin (Leaflet DivIcon) — drop shadow + subtle pulse */
-.causaflow-place-pin {
-  background: transparent !important;
-  border: 0 !important;
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.55));
-  animation: causaflow-pin-drop 0.35s ease-out;
-}
-@keyframes causaflow-pin-drop {
-  from { transform: translateY(-10px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
-}
-
-/* Style the search-pin popup to match our dark tooltip theme */
-.leaflet-popup.causaflow-place-popup .leaflet-popup-content-wrapper {
-  background: rgba(15, 23, 42, 0.95);
-  color: #e2e8f0;
-  border: 1px solid rgba(34, 211, 238, 0.4);
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-}
-.leaflet-popup.causaflow-place-popup .leaflet-popup-tip {
-  background: rgba(15, 23, 42, 0.95);
-}
-.leaflet-popup.causaflow-place-popup .leaflet-popup-content {
-  margin: 8px 10px;
-}
-.leaflet-popup.causaflow-place-popup a.leaflet-popup-close-button {
-  color: #64748b;
-}
-

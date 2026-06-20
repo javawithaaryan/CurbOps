@@ -1,7 +1,7 @@
 'use client';
 
 // ---------------------------------------------------------------------------
-// CausaFlow AI — DrillDownPanel (TypeScript port)
+// CurbOps — DrillDownPanel (TypeScript port)
 // Floating glass-morphism card opened when a zone is clicked.
 // ---------------------------------------------------------------------------
 
@@ -320,7 +320,7 @@ export default function DrillDownPanel({
             </div>
             <div>
               <div className="text-[9px] uppercase tracking-[0.14em] text-[#22d3ee] font-semibold mb-1">
-                CausaFlow · Explainability
+                CurbOps · Explainability
               </div>
               <p className="text-[11px] text-slate-200 leading-relaxed">{explainZone(zone)}</p>
             </div>

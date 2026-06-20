@@ -1,7 +1,7 @@
 'use client';
 
 // ---------------------------------------------------------------------------
-// CausaFlow AI — BTP Command Centre
+// CurbOps — BTP Command Centre
 // Main dashboard page. Orchestrates state, data fetching, view switching,
 // and the "Simulate Optimized Enforcement" killer toggle.
 // ---------------------------------------------------------------------------
@@ -75,8 +75,8 @@ export default function Home() {
   // capacity in the Simulate-Optimized-Enforcement scenario). Used to compute
   // the recovered-CBM counter.
   const deployableZones = useMemo(
-    () => annotatedZones.filter((z) => DEPLOYABLE_TIERS.includes(z.action_tier)),
-    [annotatedZones]
+    () => filteredZones.filter((z) => DEPLOYABLE_TIERS.includes(z.action_tier)),
+    [filteredZones]
   );
 
   // In Simulate mode we keep ALL filtered zones on the map (MONITOR zones fade
@@ -85,7 +85,7 @@ export default function Home() {
   // background, instead of being removed entirely.
   const visibleZones = simulate ? filteredZones : filteredZones;
 
-  const totalCBM = useMemo(() => zones.reduce((s, z) => s + (z.zone_CBM_sum || 0), 0), [zones]);
+  const totalCBM = useMemo(() => filteredZones.reduce((s, z) => s + (z.zone_CBM_sum || 0), 0), [filteredZones]);
   const deployableCBM = useMemo(
     () => deployableZones.reduce((s, z) => s + (z.zone_CBM_sum || 0), 0),
     [deployableZones]
@@ -121,7 +121,7 @@ export default function Home() {
       <div className="h-screen w-screen flex items-center justify-center bg-[#f8fafc]">
         <div className="text-center">
           <div className="inline-block w-12 h-12 border-2 border-[#3b82f6] border-t-transparent rounded-full animate-spin mb-4" />
-          <p className="text-slate-500 font-mono text-sm">Initialising CausaFlow command deck…</p>
+          <p className="text-slate-500 font-mono text-sm">Initialising CurbOps command deck…</p>
         </div>
       </div>
     );
@@ -143,8 +143,8 @@ export default function Home() {
     <div className="h-screen w-screen flex bg-[#f8fafc] overflow-hidden">
       <Sidebar
         totalCBM={totalCBM}
-        totalZones={zones.length}
-        totalViolations={stats?.total_violations ?? zones.reduce((s, z) => s + (z.violation_count || 0), 0)}
+        totalZones={filteredZones.length}
+        totalViolations={filteredZones.reduce((s, z) => s + (z.violation_count || 0), 0)}
         recoveredCBM={recoveredCBM}
         simulate={simulate}
         hideLowConfidence={hideLowConfidence}

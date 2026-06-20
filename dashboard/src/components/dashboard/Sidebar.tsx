@@ -1,7 +1,7 @@
 'use client';
 
 // ---------------------------------------------------------------------------
-// CausaFlow AI — Sidebar (TypeScript port)
+// CurbOps — Sidebar (TypeScript port)
 // Dark command-deck panel: brand, city-wide stats, toggles, station filter, nav.
 // ---------------------------------------------------------------------------
 
@@ -166,7 +166,7 @@ export default function Sidebar({
           </div>
           <div className="min-w-0">
             <div className="font-semibold text-[15px] leading-tight text-white tracking-tight">
-              CausaFlow <span className="text-[#22d3ee]">AI</span>
+              CurbOps
             </div>
             <div className="text-[10px] text-slate-500 font-mono tracking-[0.18em] uppercase mt-0.5">
               BTP Command Centre

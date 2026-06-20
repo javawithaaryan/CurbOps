@@ -14,10 +14,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CausaFlow AI · BTP Command Centre",
-  description: "Production-grade traffic-violation analytics dashboard for the Bengaluru Traffic Police. Built for Gridlock 2.0.",
-  keywords: ["CausaFlow", "BTP", "Bengaluru Traffic Police", "traffic analytics", "Gridlock 2.0", "command centre"],
-  authors: [{ name: "CausaFlow AI" }],
+  title: "CurbOps · BTP Command Centre",
+  description: "Bengaluru Traffic Police interactive parking enforcement dashboard. Prioritises Tow, Patrol, and Monitor zones using CBM (Capacity-Blockage Minutes).",
+  keywords: ["CurbOps", "BTP", "Bengaluru Traffic Police", "traffic analytics", "Gridlock 2.0", "command centre"],
+  authors: [{ name: "CurbOps" }],
   icons: {
     icon: "/favicon.svg",
   },
