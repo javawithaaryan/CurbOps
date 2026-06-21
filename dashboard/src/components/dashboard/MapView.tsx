@@ -14,12 +14,10 @@
 //     (radius × 2, 10% opacity glow underneath)
 // ---------------------------------------------------------------------------
 
-import { useEffect, useMemo, useRef, useState, Fragment } from 'react';
-import { MapContainer, TileLayer, Circle, Tooltip, useMap, Marker, Popup, Polyline } from 'react-leaflet';
-import L from 'leaflet';
+import { useEffect, useMemo, useRef, useState, useCallback, Fragment } from 'react';
+import { MapContainer, TileLayer, Circle, Tooltip, useMap } from 'react-leaflet';
 import type { LatLngExpression } from 'leaflet';
-import { getJunctionDisplayName, parseWindow } from '@/lib/dashboard/tiers';
-import MapSearch, { type PlaceResult } from './MapSearch';
+import { getJunctionDisplayName } from '@/lib/dashboard/tiers';
 import {
   TIER_COLORS,
   TIER_FILL_OPACITY,
@@ -27,6 +25,96 @@ import {
   HALO_RADIUS_MULTIPLIER,
 } from '@/lib/tierColors';
 import type { ActionTier, Zone } from '@/lib/dashboard/types';
+
+// ---------------------------------------------------------------------------
+// Place search bar (Nominatim – free, no API key, bounded to Bengaluru)
+// ---------------------------------------------------------------------------
+interface SearchResult {
+  display_name: string;
+  lat: string;
+  lon: string;
+}
+
+function MapSearchBar() {
+  const map = useMap();
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const search = useCallback(async (q: string) => {
+    if (q.trim().length < 2) { setResults([]); setOpen(false); return; }
+    setLoading(true);
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q + ' Bengaluru')}&viewbox=77.4,13.1,77.8,12.8&bounded=1&limit=5`;
+      const res = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+      const data: SearchResult[] = await res.json();
+      setResults(data);
+      setOpen(data.length > 0);
+    } catch { setResults([]); }
+    setLoading(false);
+  }, []);
+
+  const handleInput = (val: string) => {
+    setQuery(val);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => search(val), 350);
+  };
+
+  const handleSelect = (r: SearchResult) => {
+    map.flyTo([parseFloat(r.lat), parseFloat(r.lon)] as LatLngExpression, 16, { duration: 1.0 });
+    setQuery(r.display_name.split(',')[0]);
+    setOpen(false);
+  };
+
+  return (
+    <div ref={containerRef} className="absolute top-3 left-14 z-[500] w-72">
+      <div className="relative">
+        <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <circle cx="11" cy="11" r="8" />
+          <path strokeLinecap="round" d="M21 21l-4.35-4.35" />
+        </svg>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => handleInput(e.target.value)}
+          onFocus={() => results.length > 0 && setOpen(true)}
+          placeholder="Search places…"
+          className="w-full pl-8 pr-3 py-2 text-[12px] font-mono rounded-md glass-dark text-white placeholder:text-slate-500 border border-white/10 focus:border-[#22d3ee]/50 focus:outline-none transition"
+        />
+        {loading && (
+          <span className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 border-2 border-[#22d3ee] border-t-transparent rounded-full animate-spin" />
+        )}
+      </div>
+      {open && results.length > 0 && (
+        <div className="mt-1 rounded-md glass-dark border border-white/10 overflow-hidden">
+          {results.map((r, i) => (
+            <button
+              key={i}
+              onClick={() => handleSelect(r)}
+              className="w-full text-left px-3 py-2 text-[11px] font-mono text-slate-200 hover:bg-white/10 hover:text-[#22d3ee] transition border-b border-white/5 last:border-b-0"
+            >
+              {r.display_name.length > 60 ? r.display_name.slice(0, 60) + '…' : r.display_name}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const BENGALURU_CENTER: [number, number] = [12.9716, 77.5946];
 const BENGALURU_ZOOM = 12;
@@ -43,12 +131,12 @@ const BENGALURU_ZOOM = 12;
 //   • {s}  → tile subdomain (a/b/c/d) for parallel fetching
 //   • {r}  → "@2x" on retina screens, "" otherwise
 //
-// We offer three flavours in the basemap switcher:
-//   • Dark Matter        — full dark map with labels (default)
-//   • Dark Matter (clean) — same dark map, no labels (for max data-viz focus)
-//   • Satellite          — Esri World Imagery (for street-level context)
+// We offer three visually distinct basemaps:
+//   • Dark Matter — dramatic dark map with labels (default, "night ops" look)
+//   • Light       — CartoDB Positron, bright grey standard map (command-room default)
+//   • Satellite   — Esri World Imagery (real-world street-level context)
 const CARTO_DARK = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-const CARTO_DARK_NOLABELS = 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png';
+const CARTO_LIGHT = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 const CARTO_ATTR =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>';
 
@@ -61,11 +149,11 @@ const ESRI_LABELS_TILES =
 const ESRI_ATTR =
   'Tiles &copy; Esri — Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community';
 
-type BasemapKey = 'dark' | 'dark-clean' | 'satellite';
+type BasemapKey = 'dark' | 'light' | 'satellite';
 
 const BASEMAPS: { key: BasemapKey; label: string; color: string }[] = [
   { key: 'dark', label: 'Dark Matter', color: '#22d3ee' },
-  { key: 'dark-clean', label: 'Clean', color: '#a855f7' },
+  { key: 'light', label: 'Light', color: '#a855f7' },
   { key: 'satellite', label: 'Satellite', color: '#10b981' },
 ];
 
@@ -88,51 +176,6 @@ function FlyToController({
   }, [flyToZone, map]);
   return null;
 }
-
-// ---------------------------------------------------------------------------
-// Search-result fly-to controller. When a place is picked from the search
-// dropdown, we fly to a street-level zoom and drop a temporary pin.
-// ---------------------------------------------------------------------------
-function PlaceFlyToController({ place }: { place: PlaceResult | null }) {
-  const map = useMap();
-  useEffect(() => {
-    if (!place) return;
-    map.flyTo([place.lat, place.lon] as LatLngExpression, 16, {
-      duration: 0.9,
-      easeLinearity: 0.25,
-    });
-  }, [place, map]);
-  return null;
-}
-
-// Build a teardrop pin DivIcon so the search marker matches the dashboard's
-// cyan-on-dark aesthetic instead of Leaflet's default blue balloon.
-const PLACE_PIN_ICON = L.divIcon({
-  className: 'curbops-place-pin',
-  html: `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
-    <path d="M15 1.5 C8.6 1.5 3.5 6.4 3.5 12.5 C3.5 19.5 15 28.5 15 28.5 C15 28.5 26.5 19.5 26.5 12.5 C26.5 6.4 21.4 1.5 15 1.5 Z"
-      fill="#22d3ee" fill-opacity="0.25" stroke="#22d3ee" stroke-width="1.6"/>
-    <circle cx="15" cy="12.5" r="4" fill="#22d3ee"/>
-  </svg>`,
-  iconSize: [30, 30],
-  iconAnchor: [15, 28],
-  popupAnchor: [0, -26],
-});
-
-// Build a custom numbered icon for Suggested Enforcement Route stops.
-// Using inline style instead of Tailwind classes because these render inside
-// Leaflet's DOM outside the Next.js stylesheet scope.
-const createRouteStopIcon = (index: number) => {
-  if (typeof window === 'undefined') return null as unknown as L.DivIcon;
-  return L.divIcon({
-    className: 'route-stop-pin',
-    html: `<div style="width:24px;height:24px;border-radius:50%;background:#E5484D;border:2px solid #fff;color:#fff;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:11px;font-weight:700;box-shadow:0 2px 8px rgba(229,72,77,0.5)">${index + 1}</div>`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-    popupAnchor: [0, -10],
-  });
-};
-
 
 // ---------------------------------------------------------------------------
 // Custom recenter + reset controls
@@ -251,35 +294,6 @@ export default function MapView({
   // (Fastly CDN, no API key), matches the dashboard's dark aesthetic, and
   // keeps the brightly coloured enforcement zones as the visual focus.
   const [basemap, setBasemap] = useState<BasemapKey>('dark');
-  // Currently-selected place from the map search box. Holds the pin + drives
-  // the fly-to. Cleared via the marker's popup close button.
-  const [placeResult, setPlaceResult] = useState<PlaceResult | null>(null);
-  const [searchOpen, setSearchOpen] = useState(false);
-
-  // Compute Suggested Enforcement Route: TOW priority zones sorted by priority score descending (top 3 to 5)
-  const routeZones = useMemo(() => {
-    const towZones = zones.filter((z) => z.action_tier === 'TOW');
-    const sorted = [...towZones].sort((a, b) => b.priority_score - a.priority_score);
-    return sorted.slice(0, 5);
-  }, [zones]);
-
-  const shift = useMemo(() => {
-    if (routeZones.length === 0) return 'Morning';
-    const firstWin = parseWindow(routeZones[0].recommended_window);
-    if (!firstWin) return 'Morning';
-    return firstWin.start < 12 ? 'Morning' : 'Evening';
-  }, [routeZones]);
-
-  const estimatedWindow = useMemo(() => {
-    if (routeZones.length === 0) return 'N/A';
-    const windows = routeZones
-      .map((z) => parseWindow(z.recommended_window))
-      .filter((w): w is NonNullable<typeof w> => w !== null);
-    if (windows.length === 0) return routeZones[0].recommended_window || 'N/A';
-    const minStart = Math.min(...windows.map((w) => w.start));
-    const maxEnd = Math.max(...windows.map((w) => w.end));
-    return `${String(minStart).padStart(2, '0')}:00–${String(maxEnd).padStart(2, '0')}:00`;
-  }, [routeZones]);
 
   return (
     <div className="absolute inset-0">
@@ -301,50 +315,32 @@ export default function MapView({
             url={CARTO_DARK}
             attribution={CARTO_ATTR}
             maxZoom={20}
+            keepBuffer={5}
+            updateWhenZooming={false}
+            updateWhenIdle={true}
             key="carto-dark"
           />
         )}
-        {basemap === 'dark-clean' && (
+        {basemap === 'light' && (
           <TileLayer
-            url={CARTO_DARK_NOLABELS}
+            url={CARTO_LIGHT}
             attribution={CARTO_ATTR}
             maxZoom={20}
-            key="carto-dark-nolabels"
+            keepBuffer={5}
+            updateWhenZooming={false}
+            updateWhenIdle={true}
+            key="carto-light"
           />
         )}
         {basemap === 'satellite' && (
           <>
-            <TileLayer url={ESRI_TILES} attribution={ESRI_ATTR} maxZoom={19} key="esri-base" />
-            <TileLayer url={ESRI_LABELS_TILES} attribution="" maxZoom={19} key="esri-labels" />
+            <TileLayer url={ESRI_TILES} attribution={ESRI_ATTR} maxZoom={19} keepBuffer={5} updateWhenZooming={false} updateWhenIdle={true} key="esri-base" />
+            <TileLayer url={ESRI_LABELS_TILES} attribution="" maxZoom={19} keepBuffer={5} updateWhenZooming={false} updateWhenIdle={true} key="esri-labels" />
           </>
         )}
 
+        <MapSearchBar />
         <FlyToController flyToZone={flyToZone} />
-        <PlaceFlyToController place={placeResult} />
-
-        {/* Temporary pin for the place picked from the search box. */}
-        {placeResult && (
-          <Marker
-            position={[placeResult.lat, placeResult.lon] as LatLngExpression}
-            icon={PLACE_PIN_ICON}
-          >
-            <Popup className="curbops-place-popup">
-              <div className="space-y-0.5">
-                <div className="font-semibold text-[12px] text-white">
-                  {placeResult.label}
-                </div>
-                {placeResult.detail && (
-                  <div className="text-[10px] text-slate-300 font-mono">
-                    {placeResult.detail}
-                  </div>
-                )}
-                <div className="text-[9px] text-[#22d3ee] font-mono uppercase tracking-wider">
-                  {placeResult.lat.toFixed(4)}°, {placeResult.lon.toFixed(4)}°
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-        )}
 
         {zones.map((z) => {
           const tier: ActionTier = z.action_tier || 'MONITOR';
@@ -392,7 +388,19 @@ export default function MapView({
               <Circle
                 center={[z.centroid_lat, z.centroid_lon] as LatLngExpression}
                 radius={radius}
-                pathOptions={{
+                pathOptions={basemap === 'satellite' ? {
+                  color: '#ffffff',
+                  weight: isSelected ? 2 : 1,
+                  opacity: isSelected ? 1 : 0.8,
+                  fillColor: palette.fill,
+                  fillOpacity: isSelected ? 0.9 : (simulate ? (isDeployable ? 0.85 : 0.15) : 0.75),
+                } : basemap === 'light' ? {
+                  color: palette.stroke,
+                  weight: isSelected ? 2 : 1,
+                  opacity: isSelected ? 1 : 0.7,
+                  fillColor: palette.fill,
+                  fillOpacity: isSelected ? 0.9 : (simulate ? (isDeployable ? 0.85 : 0.15) : 0.75),
+                } : {
                   color: palette.stroke,
                   weight: isSelected ? TIER_STROKE.weightSelected : TIER_STROKE.weight,
                   opacity: isSelected ? TIER_STROKE.opacitySelected : TIER_STROKE.opacity,
@@ -427,46 +435,6 @@ export default function MapView({
           );
         })}
 
-        {/* Suggested Enforcement Route Polyline */}
-        {routeZones.length >= 2 && (
-          <Polyline
-            positions={routeZones.map((z) => [z.centroid_lat, z.centroid_lon] as [number, number])}
-            pathOptions={{
-              color: '#E5484D',
-              weight: 3.5,
-              opacity: 0.85,
-              dashArray: '8, 8',
-            }}
-          />
-        )}
-
-        {/* Suggested Enforcement Route Stop Markers */}
-        {routeZones.map((z, idx) => {
-          const icon = createRouteStopIcon(idx);
-          if (!icon) return null;
-          return (
-            <Marker
-              key={`route-stop-${z.zone_id}`}
-              position={[z.centroid_lat, z.centroid_lon] as LatLngExpression}
-              icon={icon}
-            >
-              <Popup className="curbops-place-popup">
-                <div className="space-y-0.5 font-mono">
-                  <div className="font-semibold text-[11px] text-white">
-                    <span className="text-red-400 font-bold">Stop #{idx + 1}:</span> {getJunctionDisplayName(z)}
-                  </div>
-                  <div className="text-[10px] text-slate-300">
-                    Priority Score: {Math.round(z.priority_score).toLocaleString('en-IN')}
-                  </div>
-                  <div className="text-[9px] text-[#22d3ee] uppercase tracking-wider">
-                    Window: {z.recommended_window}
-                  </div>
-                </div>
-              </Popup>
-            </Marker>
-          );
-        })}
-
         <MapControls
           onReset={() => {
             (mapRef.current as { flyTo?: (c: LatLngExpression, z: number, opts?: unknown) => void } | null)?.flyTo?.(
@@ -478,78 +446,7 @@ export default function MapView({
         />
       </MapContainer>
 
-      {/* Place search with autocomplete (top-left). Lives above the map so it
-          doesn't fight Leaflet's own controls (top-right). */}
-      <div className="map-search-slot">
-        <MapSearch onSelect={setPlaceResult} onOpenChange={setSearchOpen} />
-      </div>
-
-      {/* Suggested Enforcement Route Card */}
-      {routeZones.length > 0 && (
-        <div
-          className="absolute left-3 z-[600] w-[320px] glass-dark rounded-lg p-3 text-slate-200 border border-red-500/30 shadow-[0_8px_32px_rgba(0,0,0,0.5)] animate-slideIn transition-all duration-300"
-          style={{ top: searchOpen ? '380px' : '60px' }}
-        >
-          <div className="flex items-center justify-between mb-2 border-b border-red-500/20 pb-1.5">
-            <span className="text-[11px] font-mono tracking-wider uppercase font-semibold text-red-400 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-              Patrol Deployment Plan
-            </span>
-            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-500/10 text-red-300 uppercase tracking-widest border border-red-500/20 font-semibold">
-              TOW OPS
-            </span>
-          </div>
-          <div className="grid grid-cols-2 gap-1.5 text-xs font-mono mb-2">
-            <div className="bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
-              <div className="text-[9px] text-slate-500 uppercase tracking-wider">Shift</div>
-              <div className="font-semibold text-slate-200 mt-0.5">{shift}</div>
-            </div>
-            <div className="bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
-              <div className="text-[9px] text-slate-500 uppercase tracking-wider">Stops</div>
-              <div className="font-semibold text-slate-200 mt-0.5">{routeZones.length} Zones</div>
-            </div>
-            <div className="col-span-2 bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
-              <div className="text-[9px] text-slate-500 uppercase tracking-wider">Estimated Window</div>
-              <div className="font-semibold text-red-400 mt-0.5">{estimatedWindow}</div>
-            </div>
-            <div className="col-span-2 bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
-              <div className="text-[9px] text-slate-500 uppercase tracking-wider">Expected Recovery</div>
-              <div className="font-semibold text-emerald-300 mt-0.5">408,535 CBM</div>
-            </div>
-          </div>
-          {/* Stops List */}
-          <div className="space-y-1 max-h-[120px] overflow-y-auto scroll-thin border-t border-slate-800/40 pt-1.5">
-            {routeZones.map((z, idx) => (
-              <button
-                key={z.zone_id}
-                onClick={() => {
-                  onSelect(z);
-                  (mapRef.current as any)?.flyTo?.([z.centroid_lat, z.centroid_lon], 16, { duration: 0.8 });
-                }}
-                className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-white/5 text-[10px] text-left transition"
-              >
-                <span className="truncate pr-2 text-slate-300">
-                  <strong className="text-red-400 font-mono pr-1">#{idx + 1}</strong> {getJunctionDisplayName(z)}
-                </span>
-                <span className="text-[9px] text-slate-500 font-mono flex-shrink-0">
-                  Score: {Math.round(z.priority_score)}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
       <BasemapSwitcher current={basemap} onChange={setBasemap} />
-
-      <div className="map-brand-badge">
-        <div className="glass-dark rounded-md px-2.5 py-1.5 flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#22d3ee] animate-pulse" />
-          <span className="text-[10px] font-mono text-slate-300 tracking-wider uppercase">
-            CurbOps · Live Map
-          </span>
-        </div>
-      </div>
 
       <div className="scanline-overlay pointer-events-none" />
     </div>
