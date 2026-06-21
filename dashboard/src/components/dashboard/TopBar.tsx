@@ -71,15 +71,14 @@ export default function TopBar({
   simulate: boolean;
   visibleCount: number;
   totalCount: number;
-  view: 'map' | 'table';
+  view: 'map' | 'table' | 'trends';
   stationFilter: string;
 }) {
+  const title = view === 'map' ? 'Map View' : view === 'trends' ? 'City Trends' : 'Priority Table';
   return (
     <header className="h-11 bg-white border-b border-slate-200 flex items-center justify-between px-5 flex-shrink-0 z-20">
       <div className="flex items-center gap-3 text-[12px]">
-        <span className="font-semibold text-slate-800">
-          {view === 'map' ? 'Map View' : 'Priority Table'}
-        </span>
+        <span className="font-semibold text-slate-800">{title}</span>
         <span className="text-slate-300">/</span>
         <span className="text-slate-500 font-mono">
           {stationFilter === 'ALL' ? 'All stations' : stationFilter}

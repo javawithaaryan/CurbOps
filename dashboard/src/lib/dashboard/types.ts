@@ -50,3 +50,19 @@ export interface CityStats {
   action_tier_counts: Record<ActionTier, number>;
 }
 
+// ---------------------------------------------------------------------------
+// City Trends — daily parking-impact breakdown (from analytics.json)
+// ---------------------------------------------------------------------------
+export interface DailyAnalytics {
+  date: string; // YYYY-MM-DD
+  total_cbm: number;
+  morning_cbm: number; // hours 7-10
+  evening_cbm: number; // hours 17-19
+  offpeak_cbm: number;
+  active_zones?: number; // only present if a zone_id column exists in the CSV
+}
+
+export interface AnalyticsPayload {
+  daily: DailyAnalytics[];
+}
+
