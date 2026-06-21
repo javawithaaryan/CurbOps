@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// CausaFlow AI — lib/tierColors.ts
+// CurbOps — lib/tierColors.ts
 // Centralised tier colour palette. Used by the map, the priority table, and
 // the side panel so all three surfaces stay perfectly in sync.
 // ---------------------------------------------------------------------------

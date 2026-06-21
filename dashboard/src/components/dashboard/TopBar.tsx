@@ -1,7 +1,7 @@
 'use client';
 
 // ---------------------------------------------------------------------------
-// CausaFlow AI — TopBar (TypeScript port)
+// CurbOps - TopBar
 // Slim status strip above the map / table.
 // ---------------------------------------------------------------------------
 
@@ -9,20 +9,14 @@ import { useEffect, useState } from 'react';
 import { TIER_COLOR_FLAT } from '@/lib/tierColors';
 import type { ActionTier } from '@/lib/dashboard/types';
 
-const TIER_LABELS: Record<ActionTier, string> = {
-  TOW: 'TOW · IMMEDIATE DISPATCH',
-  PATROL: 'PATROL · SUSTAINED PRESENCE',
-  MONITOR: 'MONITOR · WATCH & REVIEW',
-};
-
 function TierLegend() {
   const tiers: { key: ActionTier; label: string; color: string }[] = [
-    { key: 'TOW', label: TIER_LABELS.TOW, color: TIER_COLOR_FLAT.TOW },
-    { key: 'PATROL', label: TIER_LABELS.PATROL, color: TIER_COLOR_FLAT.PATROL },
-    { key: 'MONITOR', label: TIER_LABELS.MONITOR, color: TIER_COLOR_FLAT.MONITOR },
+    { key: 'TOW', label: 'TOW', color: TIER_COLOR_FLAT.TOW },
+    { key: 'PATROL', label: 'PATROL', color: TIER_COLOR_FLAT.PATROL },
+    { key: 'MONITOR', label: 'MONITOR', color: TIER_COLOR_FLAT.MONITOR },
   ];
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-4">
       {tiers.map((t) => (
         <div key={t.key} className="flex items-center gap-1.5">
           <span
@@ -34,6 +28,14 @@ function TierLegend() {
           </span>
         </div>
       ))}
+      <div className="flex items-center gap-1.5 pl-2 border-l border-slate-200">
+        <span className="inline-block w-3 h-3 rounded-full border border-slate-400 opacity-50" />
+        <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">○ Size = CBM</span>
+      </div>
+      <div className="flex items-center gap-1.5 pl-2 border-l border-slate-200">
+        <span className="inline-block w-6 border-t-2 border-dashed border-red-400 opacity-70" />
+        <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">Dashed Line = Patrol Route</span>
+      </div>
     </div>
   );
 }

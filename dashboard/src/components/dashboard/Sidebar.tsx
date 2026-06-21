@@ -1,7 +1,7 @@
 'use client';
 
 // ---------------------------------------------------------------------------
-// CausaFlow AI — Sidebar (TypeScript port)
+// CurbOps — Sidebar
 // Dark command-deck panel: brand, city-wide stats, toggles, station filter, nav.
 // ---------------------------------------------------------------------------
 
@@ -166,7 +166,7 @@ export default function Sidebar({
           </div>
           <div className="min-w-0">
             <div className="font-semibold text-[15px] leading-tight text-white tracking-tight">
-              CausaFlow <span className="text-[#22d3ee]">AI</span>
+              CurbOps
             </div>
             <div className="text-[10px] text-slate-500 font-mono tracking-[0.18em] uppercase mt-0.5">
               BTP Command Centre
@@ -181,7 +181,7 @@ export default function Sidebar({
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           LIVE FEED
         </span>
-        <span>v2.0 · GRIDLOCK 2.0</span>
+        <span>LIVE OPERATIONS</span>
       </div>
 
       {/* City-wide stats */}
@@ -190,9 +190,9 @@ export default function Sidebar({
           City-Wide Telemetry
         </div>
         <StatBlock
-          label={simulate ? 'Congestion Minutes Recovered' : 'Total CBM (min)'}
-          value={fmtCBM(cbmShown)}
-          sub={simulate ? 'TOW+PATROL · 60% capacity gain' : 'Congestion Burden Minutes'}
+          label={simulate ? 'Congestion Minutes Recovered' : 'Congestion Burden'}
+          value={simulate ? fmtCBM(cbmShown) : `${fmtCBM(cbmShown)} CBM`}
+          sub={simulate ? 'TOW+PATROL · 60% capacity gain' : undefined}
           accent={simulate ? '#34d399' : '#22d3ee'}
         />
         <div className="grid grid-cols-2 border-b border-[#1f2a44]/60">
@@ -220,19 +220,19 @@ export default function Sidebar({
         </div>
         <ToggleRow
           label="Hide low-confidence zones"
-          hint="Filter out low-signal predictions"
+          hint="Show only confidence >=70%"
           on={hideLowConfidence}
           onClick={() => setHideLowConfidence((v) => !v)}
         />
         <ToggleRow
-          label="Simulate Optimized Enforcement"
-          hint="TOW + PATROL deployment · 60% recovery"
+          label="Recovery Simulation"
+          hint="TOW + PATROL deployment · 60% CBM recovery"
           on={simulate}
           onClick={() => setSimulate((v) => !v)}
         />
         {simulate && (
           <div className="mx-2 mt-1 mb-1 px-3 py-2 rounded-md bg-emerald-500/10 border border-emerald-500/30 text-[10px] text-emerald-300 font-mono animate-fadeIn">
-            ▶ Simulation active — TOW + PATROL zones highlighted, MONITOR faded.
+            Simulation active - TOW + PATROL zones highlighted, MONITOR faded.
           </div>
         )}
       </div>

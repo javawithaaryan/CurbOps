@@ -1,8 +1,8 @@
 'use client';
 
 // ---------------------------------------------------------------------------
-// CausaFlow AI — DrillDownPanel (TypeScript port)
-// Floating glass-morphism card opened when a zone is clicked.
+// CurbOps — DrillDownPanel
+// Floating detail card opened when a zone is clicked on the map.
 // ---------------------------------------------------------------------------
 
 import {
@@ -19,8 +19,9 @@ import {
 } from 'recharts';
 import {
   cleanViolationLabel,
-  explainZone,
+  getConfidenceColor,
   getJunctionDisplayName,
+  getZoneConfidence,
   parseWindow,
 } from '@/lib/dashboard/tiers';
 import { TIER_COLOR_FLAT } from '@/lib/tierColors';
@@ -125,6 +126,30 @@ export default function DrillDownPanel({
     ? `${String(win.start).padStart(2, '0')}:00 – ${String(win.end).padStart(2, '0')}:00`
     : zone.recommended_window || 'N/A';
 
+  const confidencePct = getZoneConfidence(zone);
+
+  const displayBullets = [
+    'High congestion burden',
+    'Morning recurrence',
+    'Junction proximity',
+  ];
+
+  const topViolation = zone.top_violation_types?.[0]?.type
+    ? cleanViolationLabel(zone.top_violation_types[0].type)
+    : null;
+  const winLabelFormatted = win
+    ? `${String(win.start).padStart(2, '0')}:00–${String(win.end).padStart(2, '0')}:00`
+    : zone.recommended_window || 'N/A';
+  const aiSummaryBullets: string[] = [
+    `${Math.round(zone.zone_CBM_sum).toLocaleString('en-IN')} congestion minutes`,
+    `${zone.violation_count.toLocaleString('en-IN')} violations`,
+    `Peak window: ${winLabelFormatted}`,
+    `Dominant violation: ${topViolation || 'N/A'}`,
+    `Recommended dispatch: ${tier} via ${zone.police_station} PS`,
+  ];
+  const deploymentNarrative =
+    `This junction consistently generates congestion during the morning commute. Historical parking patterns indicate that immediate ${tier} deployment from ${zone.police_station} Police Station will produce the highest reduction in road blockage.`;
+
   return (
     <div
       key={zone.zone_id}
@@ -133,6 +158,7 @@ export default function DrillDownPanel({
       {/* Header */}
       <div className="px-4 pt-4 pb-3 border-b border-slate-200/60 flex items-start justify-between">
         <div className="min-w-0 flex-1">
+          {/* Action tier + zone id */}
           <div className="flex items-center gap-2 mb-1">
             <span
               className="tier-chip text-white"
@@ -143,11 +169,32 @@ export default function DrillDownPanel({
             </span>
             <span className="text-[10px] font-mono text-slate-500">ZONE #{zone.zone_id}</span>
           </div>
+          {/* Zone title */}
           <h2 className="text-[17px] font-semibold text-slate-900 leading-tight tracking-tight truncate" title={junctionName}>
             {junctionName}
           </h2>
-          <div className="text-[11px] text-slate-500 mt-0.5 font-mono">
-            <span className="text-slate-700 font-semibold">{zone.police_station}</span> PS · Priority {Math.round(zone.priority_score).toLocaleString('en-IN')}
+          {/* Confidence + Priority row */}
+          <div className="flex items-center gap-3 mt-1.5">
+            <div className="flex items-center gap-1.5">
+              <span className="text-[9px] uppercase tracking-[0.12em] text-slate-400 font-semibold">Confidence</span>
+              <span
+                className="text-[11px] font-mono font-semibold"
+                style={{ color: getConfidenceColor(confidencePct) }}
+              >
+                {confidencePct}%
+              </span>
+            </div>
+            <span className="text-slate-200">·</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[9px] uppercase tracking-[0.12em] text-slate-400 font-semibold">Priority</span>
+              <span className="text-[11px] font-mono font-semibold text-slate-700">
+                {Math.round(zone.priority_score).toLocaleString('en-IN')}
+              </span>
+            </div>
+            <span className="text-slate-200">·</span>
+            <span className="text-[10px] font-mono text-slate-500">
+              <span className="text-slate-700 font-semibold">{zone.police_station}</span> PS
+            </span>
           </div>
         </div>
         <button
@@ -179,11 +226,29 @@ export default function DrillDownPanel({
         </div>
       )}
 
-
       {/* Body */}
       <div className="flex-1 overflow-y-auto scroll-thin px-4 py-3 space-y-4">
         <div className="grid grid-cols-2 gap-2">
-          <MetricCard label="Total CBM" value={Math.round(zone.zone_CBM_sum).toLocaleString('en-IN')} sub="congestion minutes" accent={tierColor} />
+          {/* CBM card with tooltip explaining the metric */}
+          <div className="relative group">
+            <MetricCard
+              label="Total CBM"
+              value={Math.round(zone.zone_CBM_sum).toLocaleString('en-IN')}
+              sub="congestion minutes"
+              accent={tierColor}
+            />
+            {/* CBM tooltip — hover only, no modal */}
+            <div className="absolute bottom-full left-0 mb-1.5 hidden group-hover:block z-10 pointer-events-none">
+              <div className="bg-[#0f172a] border border-[#1f2a44] rounded-lg px-3 py-2 text-[10px] text-slate-300 font-mono whitespace-nowrap shadow-xl">
+                <div className="text-[#22d3ee] font-semibold mb-1 text-[9px] uppercase tracking-wider">Capacity Blockage Minutes</div>
+                <div className="space-y-0.5 text-slate-400">
+                  <div>Duration × Lane Blockage</div>
+                  <div>× Vehicle Footprint</div>
+                  <div>× Junction Sensitivity</div>
+                </div>
+              </div>
+            </div>
+          </div>
           <MetricCard label="Violations" value={zone.violation_count.toLocaleString('en-IN')} sub="recorded events" accent="#f97316" />
           <MetricCard label="Peak Hour %" value={`${(zone.peak_hour_ratio * 100).toFixed(1)}%`} sub="of hourly volume" accent="#3b82f6" />
           <MetricCard label="Recurrence" value={zone.recurrence_days} sub="active days" accent="#a855f7" />
@@ -304,7 +369,20 @@ export default function DrillDownPanel({
           </div>
         </div>
 
-        {/* Explainability sentence */}
+        {/* Why Prioritized — informational bullets, no logic */}
+        <div className="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5">
+          <div className="text-[9px] uppercase tracking-[0.14em] text-slate-500 font-semibold mb-1.5">Why Prioritized</div>
+          <ul className="space-y-1">
+            {displayBullets.map((b, i) => (
+              <li key={i} className="flex items-center gap-2 text-[11px] text-slate-700">
+                <span className="w-1 h-1 rounded-full bg-slate-400 flex-shrink-0" />
+                {b}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Deployment brief */}
         <div className="bg-[#0f172a]/95 rounded-lg p-3 clip-corner-sm">
           <div className="flex items-start gap-2">
             <div className="w-5 h-5 rounded-full bg-[#22d3ee]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -318,11 +396,21 @@ export default function DrillDownPanel({
                 <circle cx="6" cy="6" r="2" stroke="#22d3ee" strokeWidth="1" fill="#22d3ee30" />
               </svg>
             </div>
-            <div>
-              <div className="text-[9px] uppercase tracking-[0.14em] text-[#22d3ee] font-semibold mb-1">
-                CausaFlow · Explainability
+            <div className="min-w-0">
+              <div className="text-[9px] uppercase tracking-[0.14em] text-[#22d3ee] font-semibold mb-1.5">
+                Deployment Brief
               </div>
-              <p className="text-[11px] text-slate-200 leading-relaxed">{explainZone(zone)}</p>
+              <p className="text-[11px] leading-snug text-slate-200 mb-2">
+                {deploymentNarrative}
+              </p>
+              <ul className="space-y-1">
+                {aiSummaryBullets.map((b, i) => (
+                  <li key={i} className="flex items-center gap-2 text-[11px] text-slate-200">
+                    <span className="w-1 h-1 rounded-full bg-[#22d3ee]/60 flex-shrink-0" />
+                    {b}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>

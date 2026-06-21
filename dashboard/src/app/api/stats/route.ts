@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// CausaFlow AI — /api/stats
+// CurbOps — /api/stats
 // Pre-computed city-wide aggregates + action-tier counts + station list.
 // ---------------------------------------------------------------------------
 

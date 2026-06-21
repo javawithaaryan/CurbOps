@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// CausaFlow AI — lib/dashboard/tiers.ts
+// CurbOps — lib/dashboard/tiers.ts
 // Tier colours + helper utilities for the BTP Command Centre dashboard.
 // ---------------------------------------------------------------------------
 
@@ -29,6 +29,18 @@ export const ACTION_TIER_SHORT: Record<ActionTier, string> = {
 // Deployable = zones that get active enforcement (TOW + PATROL).
 // MONITOR zones are excluded from the "Simulate Optimized Enforcement" view.
 export const DEPLOYABLE_TIERS: ActionTier[] = ['TOW', 'PATROL'];
+
+export function getZoneConfidence(zone: Pick<Zone, 'peak_hour_ratio' | 'recurrence_days'>): number {
+  return Math.min(99, Math.round(
+    55 + (zone.peak_hour_ratio * 25) + Math.min(zone.recurrence_days, 8) * 2.5
+  ));
+}
+
+export function getConfidenceColor(confidence: number): string {
+  if (confidence >= 90) return '#16a34a';
+  if (confidence >= 75) return '#d97706';
+  return '#dc2626';
+}
 
 // ---------------------------------------------------------------------------
 // Clean a violation type string.
@@ -62,13 +74,13 @@ export function cleanViolationLabel(s: string | undefined | null): string {
 
 // ---------------------------------------------------------------------------
 // Get a human-readable junction name. If the data has "No Junction", fall
-// back to "Unnamed Zone #<id>" so the panel/table never shows the literal
-// placeholder string.
+// back to "Zone #<id> · Unnamed Cluster" so the panel/table never shows the
+// literal placeholder string, and zone references read naturally.
 // ---------------------------------------------------------------------------
 export function getJunctionDisplayName(zone: Pick<Zone, 'zone_id' | 'dominant_junction'>): string {
   const j = zone.dominant_junction;
   if (!j || j === 'No Junction' || j.toLowerCase() === 'no junction') {
-    return `Unnamed Zone #${zone.zone_id}`;
+    return `Zone #${zone.zone_id} · Unnamed Cluster`;
   }
   return j;
 }

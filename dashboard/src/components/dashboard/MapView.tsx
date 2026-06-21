@@ -1,7 +1,7 @@
 'use client';
 
 // ---------------------------------------------------------------------------
-// CausaFlow AI — MapView
+// CurbOps — MapView
 // Full-bleed map with geographic <Circle> markers coloured by action_tier.
 // Basemap strategy: MapmyIndia (primary, judge's browser can reach it) with
 // automatic fallback to Esri World Imagery + OSM (sandbox + offline-friendly).
@@ -15,10 +15,10 @@
 // ---------------------------------------------------------------------------
 
 import { useEffect, useMemo, useRef, useState, Fragment } from 'react';
-import { MapContainer, TileLayer, Circle, Tooltip, useMap, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Circle, Tooltip, useMap, Marker, Popup, Polyline } from 'react-leaflet';
 import L from 'leaflet';
 import type { LatLngExpression } from 'leaflet';
-import { getJunctionDisplayName } from '@/lib/dashboard/tiers';
+import { getJunctionDisplayName, parseWindow } from '@/lib/dashboard/tiers';
 import MapSearch, { type PlaceResult } from './MapSearch';
 import {
   TIER_COLORS,
@@ -108,7 +108,7 @@ function PlaceFlyToController({ place }: { place: PlaceResult | null }) {
 // Build a teardrop pin DivIcon so the search marker matches the dashboard's
 // cyan-on-dark aesthetic instead of Leaflet's default blue balloon.
 const PLACE_PIN_ICON = L.divIcon({
-  className: 'causaflow-place-pin',
+  className: 'curbops-place-pin',
   html: `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30">
     <path d="M15 1.5 C8.6 1.5 3.5 6.4 3.5 12.5 C3.5 19.5 15 28.5 15 28.5 C15 28.5 26.5 19.5 26.5 12.5 C26.5 6.4 21.4 1.5 15 1.5 Z"
       fill="#22d3ee" fill-opacity="0.25" stroke="#22d3ee" stroke-width="1.6"/>
@@ -118,6 +118,20 @@ const PLACE_PIN_ICON = L.divIcon({
   iconAnchor: [15, 28],
   popupAnchor: [0, -26],
 });
+
+// Build a custom numbered icon for Suggested Enforcement Route stops.
+// Using inline style instead of Tailwind classes because these render inside
+// Leaflet's DOM outside the Next.js stylesheet scope.
+const createRouteStopIcon = (index: number) => {
+  if (typeof window === 'undefined') return null as unknown as L.DivIcon;
+  return L.divIcon({
+    className: 'route-stop-pin',
+    html: `<div style="width:24px;height:24px;border-radius:50%;background:#E5484D;border:2px solid #fff;color:#fff;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:11px;font-weight:700;box-shadow:0 2px 8px rgba(229,72,77,0.5)">${index + 1}</div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+    popupAnchor: [0, -10],
+  });
+};
 
 
 // ---------------------------------------------------------------------------
@@ -240,6 +254,32 @@ export default function MapView({
   // Currently-selected place from the map search box. Holds the pin + drives
   // the fly-to. Cleared via the marker's popup close button.
   const [placeResult, setPlaceResult] = useState<PlaceResult | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Compute Suggested Enforcement Route: TOW priority zones sorted by priority score descending (top 3 to 5)
+  const routeZones = useMemo(() => {
+    const towZones = zones.filter((z) => z.action_tier === 'TOW');
+    const sorted = [...towZones].sort((a, b) => b.priority_score - a.priority_score);
+    return sorted.slice(0, 5);
+  }, [zones]);
+
+  const shift = useMemo(() => {
+    if (routeZones.length === 0) return 'Morning';
+    const firstWin = parseWindow(routeZones[0].recommended_window);
+    if (!firstWin) return 'Morning';
+    return firstWin.start < 12 ? 'Morning' : 'Evening';
+  }, [routeZones]);
+
+  const estimatedWindow = useMemo(() => {
+    if (routeZones.length === 0) return 'N/A';
+    const windows = routeZones
+      .map((z) => parseWindow(z.recommended_window))
+      .filter((w): w is NonNullable<typeof w> => w !== null);
+    if (windows.length === 0) return routeZones[0].recommended_window || 'N/A';
+    const minStart = Math.min(...windows.map((w) => w.start));
+    const maxEnd = Math.max(...windows.map((w) => w.end));
+    return `${String(minStart).padStart(2, '0')}:00–${String(maxEnd).padStart(2, '0')}:00`;
+  }, [routeZones]);
 
   return (
     <div className="absolute inset-0">
@@ -288,7 +328,7 @@ export default function MapView({
             position={[placeResult.lat, placeResult.lon] as LatLngExpression}
             icon={PLACE_PIN_ICON}
           >
-            <Popup className="causaflow-place-popup">
+            <Popup className="curbops-place-popup">
               <div className="space-y-0.5">
                 <div className="font-semibold text-[12px] text-white">
                   {placeResult.label}
@@ -363,7 +403,7 @@ export default function MapView({
               >
                 <Tooltip
                   direction="top"
-                  className="causaflow-tooltip"
+                  className="curbops-tooltip"
                   opacity={1}
                 >
                   <div className="space-y-0.5">
@@ -387,6 +427,46 @@ export default function MapView({
           );
         })}
 
+        {/* Suggested Enforcement Route Polyline */}
+        {routeZones.length >= 2 && (
+          <Polyline
+            positions={routeZones.map((z) => [z.centroid_lat, z.centroid_lon] as [number, number])}
+            pathOptions={{
+              color: '#E5484D',
+              weight: 3.5,
+              opacity: 0.85,
+              dashArray: '8, 8',
+            }}
+          />
+        )}
+
+        {/* Suggested Enforcement Route Stop Markers */}
+        {routeZones.map((z, idx) => {
+          const icon = createRouteStopIcon(idx);
+          if (!icon) return null;
+          return (
+            <Marker
+              key={`route-stop-${z.zone_id}`}
+              position={[z.centroid_lat, z.centroid_lon] as LatLngExpression}
+              icon={icon}
+            >
+              <Popup className="curbops-place-popup">
+                <div className="space-y-0.5 font-mono">
+                  <div className="font-semibold text-[11px] text-white">
+                    <span className="text-red-400 font-bold">Stop #{idx + 1}:</span> {getJunctionDisplayName(z)}
+                  </div>
+                  <div className="text-[10px] text-slate-300">
+                    Priority Score: {Math.round(z.priority_score).toLocaleString('en-IN')}
+                  </div>
+                  <div className="text-[9px] text-[#22d3ee] uppercase tracking-wider">
+                    Window: {z.recommended_window}
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+
         <MapControls
           onReset={() => {
             (mapRef.current as { flyTo?: (c: LatLngExpression, z: number, opts?: unknown) => void } | null)?.flyTo?.(
@@ -401,8 +481,64 @@ export default function MapView({
       {/* Place search with autocomplete (top-left). Lives above the map so it
           doesn't fight Leaflet's own controls (top-right). */}
       <div className="map-search-slot">
-        <MapSearch onSelect={setPlaceResult} />
+        <MapSearch onSelect={setPlaceResult} onOpenChange={setSearchOpen} />
       </div>
+
+      {/* Suggested Enforcement Route Card */}
+      {routeZones.length > 0 && (
+        <div
+          className="absolute left-3 z-[600] w-[320px] glass-dark rounded-lg p-3 text-slate-200 border border-red-500/30 shadow-[0_8px_32px_rgba(0,0,0,0.5)] animate-slideIn transition-all duration-300"
+          style={{ top: searchOpen ? '380px' : '60px' }}
+        >
+          <div className="flex items-center justify-between mb-2 border-b border-red-500/20 pb-1.5">
+            <span className="text-[11px] font-mono tracking-wider uppercase font-semibold text-red-400 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+              Patrol Deployment Plan
+            </span>
+            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-red-500/10 text-red-300 uppercase tracking-widest border border-red-500/20 font-semibold">
+              TOW OPS
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-1.5 text-xs font-mono mb-2">
+            <div className="bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
+              <div className="text-[9px] text-slate-500 uppercase tracking-wider">Shift</div>
+              <div className="font-semibold text-slate-200 mt-0.5">{shift}</div>
+            </div>
+            <div className="bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
+              <div className="text-[9px] text-slate-500 uppercase tracking-wider">Stops</div>
+              <div className="font-semibold text-slate-200 mt-0.5">{routeZones.length} Zones</div>
+            </div>
+            <div className="col-span-2 bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
+              <div className="text-[9px] text-slate-500 uppercase tracking-wider">Estimated Window</div>
+              <div className="font-semibold text-red-400 mt-0.5">{estimatedWindow}</div>
+            </div>
+            <div className="col-span-2 bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
+              <div className="text-[9px] text-slate-500 uppercase tracking-wider">Expected Recovery</div>
+              <div className="font-semibold text-emerald-300 mt-0.5">408,535 CBM</div>
+            </div>
+          </div>
+          {/* Stops List */}
+          <div className="space-y-1 max-h-[120px] overflow-y-auto scroll-thin border-t border-slate-800/40 pt-1.5">
+            {routeZones.map((z, idx) => (
+              <button
+                key={z.zone_id}
+                onClick={() => {
+                  onSelect(z);
+                  (mapRef.current as any)?.flyTo?.([z.centroid_lat, z.centroid_lon], 16, { duration: 0.8 });
+                }}
+                className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-white/5 text-[10px] text-left transition"
+              >
+                <span className="truncate pr-2 text-slate-300">
+                  <strong className="text-red-400 font-mono pr-1">#{idx + 1}</strong> {getJunctionDisplayName(z)}
+                </span>
+                <span className="text-[9px] text-slate-500 font-mono flex-shrink-0">
+                  Score: {Math.round(z.priority_score)}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <BasemapSwitcher current={basemap} onChange={setBasemap} />
 
@@ -410,7 +546,7 @@ export default function MapView({
         <div className="glass-dark rounded-md px-2.5 py-1.5 flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-[#22d3ee] animate-pulse" />
           <span className="text-[10px] font-mono text-slate-300 tracking-wider uppercase">
-            CausaFlow · Live Map
+            CurbOps · Live Map
           </span>
         </div>
       </div>

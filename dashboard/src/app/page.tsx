@@ -1,9 +1,9 @@
 'use client';
 
 // ---------------------------------------------------------------------------
-// CausaFlow AI — BTP Command Centre
+// CurbOps — BTP Command Centre
 // Main dashboard page. Orchestrates state, data fetching, view switching,
-// and the "Simulate Optimized Enforcement" killer toggle.
+// and the "Recovery Simulation" toggle.
 // ---------------------------------------------------------------------------
 
 import { useEffect, useMemo, useState } from 'react';
@@ -12,7 +12,7 @@ import Sidebar from '@/components/dashboard/Sidebar';
 import TopBar from '@/components/dashboard/TopBar';
 import DrillDownPanel from '@/components/dashboard/DrillDownPanel';
 import PriorityTable from '@/components/dashboard/PriorityTable';
-import { DEPLOYABLE_TIERS } from '@/lib/dashboard/tiers';
+import { DEPLOYABLE_TIERS, getZoneConfidence } from '@/lib/dashboard/tiers';
 import type { CityStats, Zone } from '@/lib/dashboard/types';
 
 // Leaflet must only render on the client.
@@ -66,7 +66,7 @@ export default function Home() {
 
   const filteredZones = useMemo(() => {
     let out = annotatedZones;
-    if (hideLowConfidence) out = out.filter((z) => !z.low_confidence);
+    if (hideLowConfidence) out = out.filter((z) => getZoneConfidence(z) >= 70);
     if (stationFilter !== 'ALL') out = out.filter((z) => z.police_station === stationFilter);
     return out;
   }, [annotatedZones, hideLowConfidence, stationFilter]);
@@ -99,16 +99,23 @@ export default function Home() {
   // -------------------------------------------------------------------
   useEffect(() => {
     if (stationFilter === 'ALL') return;
-    // Find the highest-CBM zone for this station (annotatedZones is sorted
+    // Find the highest-CBM zone for this station (the source data is sorted
     // by CBM desc in the source dataset, so the first match is the worst).
-    const target = annotatedZones.find((z) => z.police_station === stationFilter);
+    const target = filteredZones.find((z) => z.police_station === stationFilter);
     if (!target) return;
     setFlyToZone({
       lat: target.centroid_lat,
       lon: target.centroid_lon,
       radius_m: target.radius_m,
     });
-  }, [stationFilter, annotatedZones]);
+  }, [stationFilter, filteredZones]);
+
+  useEffect(() => {
+    if (!selectedZone) return;
+    if (!filteredZones.some((z) => z.zone_id === selectedZone.zone_id)) {
+      setSelectedZone(null);
+    }
+  }, [filteredZones, selectedZone]);
 
   const handleSelectFromTable = (zone: Zone) => {
     setSelectedZone(zone);
@@ -121,7 +128,7 @@ export default function Home() {
       <div className="h-screen w-screen flex items-center justify-center bg-[#f8fafc]">
         <div className="text-center">
           <div className="inline-block w-12 h-12 border-2 border-[#3b82f6] border-t-transparent rounded-full animate-spin mb-4" />
-          <p className="text-slate-500 font-mono text-sm">Initialising CausaFlow command deck…</p>
+          <p className="text-slate-500 font-mono text-sm">Initialising CurbOps command deck…</p>
         </div>
       </div>
     );

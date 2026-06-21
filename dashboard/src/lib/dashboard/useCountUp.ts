@@ -1,7 +1,7 @@
 'use client';
 
 // ---------------------------------------------------------------------------
-// CausaFlow AI — lib/dashboard/useCountUp.ts
+// CurbOps — lib/dashboard/useCountUp.ts
 // Smooth count-up animation hook for the "congestion recovered" counter.
 // ---------------------------------------------------------------------------
 

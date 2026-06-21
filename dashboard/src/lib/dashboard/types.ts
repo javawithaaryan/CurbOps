@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// CausaFlow AI — lib/dashboard/types.ts
+// CurbOps — lib/dashboard/types.ts
 // Shared TypeScript types for the BTP Command Centre dashboard.
 // ---------------------------------------------------------------------------
 

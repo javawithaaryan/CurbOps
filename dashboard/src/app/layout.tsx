@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "@/components/ui/toaster";
 
 const interSans = Inter({
   variable: "--font-inter",
@@ -14,10 +13,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CausaFlow AI · BTP Command Centre",
-  description: "Production-grade traffic-violation analytics dashboard for the Bengaluru Traffic Police. Built for Gridlock 2.0.",
-  keywords: ["CausaFlow", "BTP", "Bengaluru Traffic Police", "traffic analytics", "Gridlock 2.0", "command centre"],
-  authors: [{ name: "CausaFlow AI" }],
+  title: "CurbOps · BTP Command Centre",
+  description: "Operational command centre for Bengaluru Traffic Police parking enforcement, CBM scoring, hotspot prioritization, and patrol deployment support.",
+  keywords: ["CurbOps", "BTP", "Bengaluru Traffic Police", "traffic analytics", "live operations", "command centre"],
+  authors: [{ name: "CurbOps" }],
   icons: {
     icon: "/favicon.svg",
   },
@@ -34,7 +33,6 @@ export default function RootLayout({
         className={`${interSans.variable} ${jetbrainsMono.variable} antialiased`}
       >
         {children}
-        <Toaster />
       </body>
     </html>
   );

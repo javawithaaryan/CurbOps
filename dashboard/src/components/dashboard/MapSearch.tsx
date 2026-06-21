@@ -26,6 +26,7 @@ export interface PlaceResult {
 
 interface MapSearchProps {
   onSelect: (place: PlaceResult) => void;
+  onOpenChange?: (open: boolean) => void;
 }
 
 // Greater-Bengaluru bias box (left, top, right, bottom in lon/lat).
@@ -74,7 +75,7 @@ function buildLabel(r: NominatimResult): { label: string; detail: string } {
   };
 }
 
-export default function MapSearch({ onSelect }: MapSearchProps) {
+export default function MapSearch({ onSelect, onOpenChange }: MapSearchProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<PlaceResult[]>([]);
   const [open, setOpen] = useState(false);
@@ -182,6 +183,10 @@ export default function MapSearch({ onSelect }: MapSearchProps) {
   };
 
   const showDropdown = open && (query.trim().length >= 2);
+
+  useEffect(() => {
+    onOpenChange?.(showDropdown);
+  }, [showDropdown, onOpenChange]);
 
   return (
     <div ref={boxRef} className="map-search-wrap">

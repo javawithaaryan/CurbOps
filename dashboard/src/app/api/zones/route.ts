@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// CausaFlow AI — /api/zones
+// CurbOps — /api/zones
 // Returns the full zone summary array (2,021 zones, sorted by priority_score
 // desc). Re-reads the file on every request so data updates are picked up
 // immediately without a server restart.

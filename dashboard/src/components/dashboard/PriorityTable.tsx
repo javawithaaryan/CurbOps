@@ -1,7 +1,7 @@
 'use client';
 
 // ---------------------------------------------------------------------------
-// CausaFlow AI — PriorityTable (TypeScript port)
+// CurbOps — PriorityTable
 // Sortable, tier-coloured table. Click a row → fly to map + open drill-down.
 // ---------------------------------------------------------------------------
 
@@ -70,8 +70,8 @@ export default function PriorityTable({
       );
     }
     arr.sort((a, b) => {
-      let av: unknown = (a as Record<string, unknown>)[sortKey];
-      let bv: unknown = (b as Record<string, unknown>)[sortKey];
+      let av: unknown = (a as any)[sortKey];
+      let bv: unknown = (b as any)[sortKey];
       if (sortKey === 'action_tier') {
         const order: Record<ActionTier, number> = { TOW: 3, PATROL: 2, MONITOR: 1 };
         av = order[(av as ActionTier) ?? 'MONITOR'] ?? 0;
