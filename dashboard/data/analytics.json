@@ -1,0 +1,956 @@
+{
+  "daily": [
+    {
+      "date": "2023-11-09",
+      "total_cbm": 1901.94,
+      "morning_cbm": 0.0,
+      "evening_cbm": 3.6,
+      "offpeak_cbm": 1898.34
+    },
+    {
+      "date": "2023-11-10",
+      "total_cbm": 15278.59,
+      "morning_cbm": 1243.28,
+      "evening_cbm": 62.95,
+      "offpeak_cbm": 13972.35
+    },
+    {
+      "date": "2023-11-11",
+      "total_cbm": 17854.02,
+      "morning_cbm": 1565.97,
+      "evening_cbm": 455.96,
+      "offpeak_cbm": 15832.09
+    },
+    {
+      "date": "2023-11-12",
+      "total_cbm": 21466.16,
+      "morning_cbm": 1336.66,
+      "evening_cbm": 655.47,
+      "offpeak_cbm": 19474.04
+    },
+    {
+      "date": "2023-11-13",
+      "total_cbm": 17575.94,
+      "morning_cbm": 1374.67,
+      "evening_cbm": 384.49,
+      "offpeak_cbm": 15816.78
+    },
+    {
+      "date": "2023-11-14",
+      "total_cbm": 23584.31,
+      "morning_cbm": 2221.02,
+      "evening_cbm": 178.91,
+      "offpeak_cbm": 21184.39
+    },
+    {
+      "date": "2023-11-15",
+      "total_cbm": 24651.47,
+      "morning_cbm": 974.2,
+      "evening_cbm": 1133.06,
+      "offpeak_cbm": 22544.2
+    },
+    {
+      "date": "2023-11-16",
+      "total_cbm": 19913.86,
+      "morning_cbm": 963.44,
+      "evening_cbm": 1077.56,
+      "offpeak_cbm": 17872.87
+    },
+    {
+      "date": "2023-11-17",
+      "total_cbm": 26795.56,
+      "morning_cbm": 1073.02,
+      "evening_cbm": 220.39,
+      "offpeak_cbm": 25502.15
+    },
+    {
+      "date": "2023-11-18",
+      "total_cbm": 24920.81,
+      "morning_cbm": 3654.3,
+      "evening_cbm": 860.88,
+      "offpeak_cbm": 20405.63
+    },
+    {
+      "date": "2023-11-19",
+      "total_cbm": 18768.82,
+      "morning_cbm": 1596.28,
+      "evening_cbm": 715.27,
+      "offpeak_cbm": 16457.28
+    },
+    {
+      "date": "2023-11-20",
+      "total_cbm": 15190.06,
+      "morning_cbm": 1093.3,
+      "evening_cbm": 1143.25,
+      "offpeak_cbm": 12953.5
+    },
+    {
+      "date": "2023-11-21",
+      "total_cbm": 20119.47,
+      "morning_cbm": 1408.19,
+      "evening_cbm": 1809.15,
+      "offpeak_cbm": 16902.12
+    },
+    {
+      "date": "2023-11-22",
+      "total_cbm": 18234.63,
+      "morning_cbm": 1070.7,
+      "evening_cbm": 927.03,
+      "offpeak_cbm": 16236.9
+    },
+    {
+      "date": "2023-11-23",
+      "total_cbm": 14897.2,
+      "morning_cbm": 1297.28,
+      "evening_cbm": 194.08,
+      "offpeak_cbm": 13405.83
+    },
+    {
+      "date": "2023-11-24",
+      "total_cbm": 9797.19,
+      "morning_cbm": 571.06,
+      "evening_cbm": 282.64,
+      "offpeak_cbm": 8943.49
+    },
+    {
+      "date": "2023-11-25",
+      "total_cbm": 17413.67,
+      "morning_cbm": 919.04,
+      "evening_cbm": 299.16,
+      "offpeak_cbm": 16195.46
+    },
+    {
+      "date": "2023-11-26",
+      "total_cbm": 15757.11,
+      "morning_cbm": 1706.15,
+      "evening_cbm": 372.71,
+      "offpeak_cbm": 13678.25
+    },
+    {
+      "date": "2023-11-27",
+      "total_cbm": 11984.09,
+      "morning_cbm": 1399.95,
+      "evening_cbm": 479.45,
+      "offpeak_cbm": 10104.69
+    },
+    {
+      "date": "2023-11-28",
+      "total_cbm": 14888.91,
+      "morning_cbm": 779.64,
+      "evening_cbm": 593.95,
+      "offpeak_cbm": 13515.31
+    },
+    {
+      "date": "2023-11-29",
+      "total_cbm": 19964.94,
+      "morning_cbm": 1499.6,
+      "evening_cbm": 666.67,
+      "offpeak_cbm": 17798.67
+    },
+    {
+      "date": "2023-11-30",
+      "total_cbm": 16242.97,
+      "morning_cbm": 1445.84,
+      "evening_cbm": 303.38,
+      "offpeak_cbm": 14493.75
+    },
+    {
+      "date": "2023-12-01",
+      "total_cbm": 18538.94,
+      "morning_cbm": 2050.72,
+      "evening_cbm": 469.47,
+      "offpeak_cbm": 16018.75
+    },
+    {
+      "date": "2023-12-02",
+      "total_cbm": 16771.01,
+      "morning_cbm": 1788.72,
+      "evening_cbm": 988.89,
+      "offpeak_cbm": 13993.39
+    },
+    {
+      "date": "2023-12-03",
+      "total_cbm": 23216.29,
+      "morning_cbm": 2901.26,
+      "evening_cbm": 843.94,
+      "offpeak_cbm": 19471.08
+    },
+    {
+      "date": "2023-12-04",
+      "total_cbm": 8499.96,
+      "morning_cbm": 243.94,
+      "evening_cbm": 65.81,
+      "offpeak_cbm": 8190.21
+    },
+    {
+      "date": "2023-12-05",
+      "total_cbm": 18126.79,
+      "morning_cbm": 607.3,
+      "evening_cbm": 1354.42,
+      "offpeak_cbm": 16165.08
+    },
+    {
+      "date": "2023-12-06",
+      "total_cbm": 19640.2,
+      "morning_cbm": 1297.74,
+      "evening_cbm": 914.31,
+      "offpeak_cbm": 17428.15
+    },
+    {
+      "date": "2023-12-07",
+      "total_cbm": 19448.76,
+      "morning_cbm": 1926.48,
+      "evening_cbm": 937.89,
+      "offpeak_cbm": 16584.4
+    },
+    {
+      "date": "2023-12-08",
+      "total_cbm": 19695.73,
+      "morning_cbm": 1462.83,
+      "evening_cbm": 546.22,
+      "offpeak_cbm": 17686.68
+    },
+    {
+      "date": "2023-12-09",
+      "total_cbm": 23658.47,
+      "morning_cbm": 1432.04,
+      "evening_cbm": 581.92,
+      "offpeak_cbm": 21644.51
+    },
+    {
+      "date": "2023-12-10",
+      "total_cbm": 20307.57,
+      "morning_cbm": 2127.83,
+      "evening_cbm": 522.38,
+      "offpeak_cbm": 17657.36
+    },
+    {
+      "date": "2023-12-11",
+      "total_cbm": 16461.54,
+      "morning_cbm": 826.17,
+      "evening_cbm": 582.2,
+      "offpeak_cbm": 15053.18
+    },
+    {
+      "date": "2023-12-12",
+      "total_cbm": 20968.63,
+      "morning_cbm": 467.09,
+      "evening_cbm": 291.78,
+      "offpeak_cbm": 20209.76
+    },
+    {
+      "date": "2023-12-13",
+      "total_cbm": 22394.19,
+      "morning_cbm": 1493.09,
+      "evening_cbm": 796.13,
+      "offpeak_cbm": 20104.97
+    },
+    {
+      "date": "2023-12-14",
+      "total_cbm": 20746.0,
+      "morning_cbm": 1932.77,
+      "evening_cbm": 557.95,
+      "offpeak_cbm": 18255.28
+    },
+    {
+      "date": "2023-12-15",
+      "total_cbm": 14024.07,
+      "morning_cbm": 708.35,
+      "evening_cbm": 1046.27,
+      "offpeak_cbm": 12269.45
+    },
+    {
+      "date": "2023-12-16",
+      "total_cbm": 16410.72,
+      "morning_cbm": 913.14,
+      "evening_cbm": 1137.33,
+      "offpeak_cbm": 14360.24
+    },
+    {
+      "date": "2023-12-17",
+      "total_cbm": 15937.89,
+      "morning_cbm": 1473.44,
+      "evening_cbm": 748.35,
+      "offpeak_cbm": 13716.11
+    },
+    {
+      "date": "2023-12-18",
+      "total_cbm": 15545.75,
+      "morning_cbm": 842.59,
+      "evening_cbm": 660.21,
+      "offpeak_cbm": 14042.95
+    },
+    {
+      "date": "2023-12-19",
+      "total_cbm": 21258.77,
+      "morning_cbm": 1778.0,
+      "evening_cbm": 1912.83,
+      "offpeak_cbm": 17567.94
+    },
+    {
+      "date": "2023-12-20",
+      "total_cbm": 17045.48,
+      "morning_cbm": 701.38,
+      "evening_cbm": 928.87,
+      "offpeak_cbm": 15415.22
+    },
+    {
+      "date": "2023-12-21",
+      "total_cbm": 16680.11,
+      "morning_cbm": 342.55,
+      "evening_cbm": 429.5,
+      "offpeak_cbm": 15908.06
+    },
+    {
+      "date": "2023-12-22",
+      "total_cbm": 19190.72,
+      "morning_cbm": 565.3,
+      "evening_cbm": 264.42,
+      "offpeak_cbm": 18361.01
+    },
+    {
+      "date": "2023-12-23",
+      "total_cbm": 18263.83,
+      "morning_cbm": 1596.75,
+      "evening_cbm": 1252.34,
+      "offpeak_cbm": 15414.74
+    },
+    {
+      "date": "2023-12-24",
+      "total_cbm": 17375.36,
+      "morning_cbm": 2120.99,
+      "evening_cbm": 408.76,
+      "offpeak_cbm": 14845.61
+    },
+    {
+      "date": "2023-12-25",
+      "total_cbm": 15976.93,
+      "morning_cbm": 2157.68,
+      "evening_cbm": 2212.25,
+      "offpeak_cbm": 11606.99
+    },
+    {
+      "date": "2023-12-26",
+      "total_cbm": 17436.97,
+      "morning_cbm": 1937.84,
+      "evening_cbm": 349.54,
+      "offpeak_cbm": 15149.59
+    },
+    {
+      "date": "2023-12-27",
+      "total_cbm": 20568.71,
+      "morning_cbm": 1704.11,
+      "evening_cbm": 1088.5,
+      "offpeak_cbm": 17776.11
+    },
+    {
+      "date": "2023-12-28",
+      "total_cbm": 19727.0,
+      "morning_cbm": 797.94,
+      "evening_cbm": 718.22,
+      "offpeak_cbm": 18210.84
+    },
+    {
+      "date": "2023-12-29",
+      "total_cbm": 16598.02,
+      "morning_cbm": 917.32,
+      "evening_cbm": 1118.73,
+      "offpeak_cbm": 14561.98
+    },
+    {
+      "date": "2023-12-30",
+      "total_cbm": 18271.59,
+      "morning_cbm": 683.69,
+      "evening_cbm": 1136.84,
+      "offpeak_cbm": 16451.06
+    },
+    {
+      "date": "2023-12-31",
+      "total_cbm": 16152.43,
+      "morning_cbm": 2103.24,
+      "evening_cbm": 122.3,
+      "offpeak_cbm": 13926.9
+    },
+    {
+      "date": "2024-01-01",
+      "total_cbm": 16957.16,
+      "morning_cbm": 614.47,
+      "evening_cbm": 648.58,
+      "offpeak_cbm": 15694.1
+    },
+    {
+      "date": "2024-01-02",
+      "total_cbm": 12362.52,
+      "morning_cbm": 812.89,
+      "evening_cbm": 734.57,
+      "offpeak_cbm": 10815.06
+    },
+    {
+      "date": "2024-01-03",
+      "total_cbm": 13692.25,
+      "morning_cbm": 575.61,
+      "evening_cbm": 332.98,
+      "offpeak_cbm": 12783.66
+    },
+    {
+      "date": "2024-01-04",
+      "total_cbm": 21305.2,
+      "morning_cbm": 748.47,
+      "evening_cbm": 1268.28,
+      "offpeak_cbm": 19288.46
+    },
+    {
+      "date": "2024-01-05",
+      "total_cbm": 16374.63,
+      "morning_cbm": 422.04,
+      "evening_cbm": 1865.64,
+      "offpeak_cbm": 14086.94
+    },
+    {
+      "date": "2024-01-06",
+      "total_cbm": 11936.31,
+      "morning_cbm": 1126.42,
+      "evening_cbm": 860.63,
+      "offpeak_cbm": 9949.26
+    },
+    {
+      "date": "2024-01-07",
+      "total_cbm": 12032.67,
+      "morning_cbm": 564.99,
+      "evening_cbm": 475.03,
+      "offpeak_cbm": 10992.66
+    },
+    {
+      "date": "2024-01-08",
+      "total_cbm": 2082.7,
+      "morning_cbm": 58.98,
+      "evening_cbm": 586.5,
+      "offpeak_cbm": 1437.21
+    },
+    {
+      "date": "2024-01-09",
+      "total_cbm": 9699.25,
+      "morning_cbm": 373.22,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 9326.02
+    },
+    {
+      "date": "2024-01-10",
+      "total_cbm": 19566.37,
+      "morning_cbm": 1593.89,
+      "evening_cbm": 2603.23,
+      "offpeak_cbm": 15369.25
+    },
+    {
+      "date": "2024-01-11",
+      "total_cbm": 20959.78,
+      "morning_cbm": 726.27,
+      "evening_cbm": 417.99,
+      "offpeak_cbm": 19815.52
+    },
+    {
+      "date": "2024-01-12",
+      "total_cbm": 19901.58,
+      "morning_cbm": 1697.8,
+      "evening_cbm": 1952.08,
+      "offpeak_cbm": 16251.7
+    },
+    {
+      "date": "2024-01-13",
+      "total_cbm": 16007.48,
+      "morning_cbm": 1411.22,
+      "evening_cbm": 1254.72,
+      "offpeak_cbm": 13341.54
+    },
+    {
+      "date": "2024-01-14",
+      "total_cbm": 24101.88,
+      "morning_cbm": 4379.12,
+      "evening_cbm": 436.98,
+      "offpeak_cbm": 19285.77
+    },
+    {
+      "date": "2024-01-15",
+      "total_cbm": 20410.76,
+      "morning_cbm": 1697.54,
+      "evening_cbm": 1941.4,
+      "offpeak_cbm": 16771.82
+    },
+    {
+      "date": "2024-01-16",
+      "total_cbm": 25001.98,
+      "morning_cbm": 2362.29,
+      "evening_cbm": 543.73,
+      "offpeak_cbm": 22095.95
+    },
+    {
+      "date": "2024-01-17",
+      "total_cbm": 22534.03,
+      "morning_cbm": 1329.78,
+      "evening_cbm": 1085.25,
+      "offpeak_cbm": 20119.0
+    },
+    {
+      "date": "2024-01-18",
+      "total_cbm": 20779.78,
+      "morning_cbm": 1079.89,
+      "evening_cbm": 996.68,
+      "offpeak_cbm": 18703.21
+    },
+    {
+      "date": "2024-01-19",
+      "total_cbm": 21928.16,
+      "morning_cbm": 1803.88,
+      "evening_cbm": 728.19,
+      "offpeak_cbm": 19396.1
+    },
+    {
+      "date": "2024-01-20",
+      "total_cbm": 21119.7,
+      "morning_cbm": 3154.86,
+      "evening_cbm": 2600.54,
+      "offpeak_cbm": 15364.29
+    },
+    {
+      "date": "2024-01-21",
+      "total_cbm": 22332.44,
+      "morning_cbm": 2387.02,
+      "evening_cbm": 2326.51,
+      "offpeak_cbm": 17618.91
+    },
+    {
+      "date": "2024-01-22",
+      "total_cbm": 19756.34,
+      "morning_cbm": 1117.66,
+      "evening_cbm": 1468.05,
+      "offpeak_cbm": 17170.63
+    },
+    {
+      "date": "2024-01-23",
+      "total_cbm": 15810.28,
+      "morning_cbm": 1435.56,
+      "evening_cbm": 1136.12,
+      "offpeak_cbm": 13238.6
+    },
+    {
+      "date": "2024-01-24",
+      "total_cbm": 20940.46,
+      "morning_cbm": 1912.32,
+      "evening_cbm": 1576.33,
+      "offpeak_cbm": 17451.81
+    },
+    {
+      "date": "2024-01-25",
+      "total_cbm": 18403.59,
+      "morning_cbm": 1081.84,
+      "evening_cbm": 934.93,
+      "offpeak_cbm": 16386.82
+    },
+    {
+      "date": "2024-01-26",
+      "total_cbm": 10104.45,
+      "morning_cbm": 1174.17,
+      "evening_cbm": 901.85,
+      "offpeak_cbm": 8028.43
+    },
+    {
+      "date": "2024-01-27",
+      "total_cbm": 8096.96,
+      "morning_cbm": 820.46,
+      "evening_cbm": 688.84,
+      "offpeak_cbm": 6587.67
+    },
+    {
+      "date": "2024-01-28",
+      "total_cbm": 8753.08,
+      "morning_cbm": 686.47,
+      "evening_cbm": 185.79,
+      "offpeak_cbm": 7880.82
+    },
+    {
+      "date": "2024-01-29",
+      "total_cbm": 16318.85,
+      "morning_cbm": 1416.97,
+      "evening_cbm": 234.48,
+      "offpeak_cbm": 14667.4
+    },
+    {
+      "date": "2024-01-30",
+      "total_cbm": 16966.15,
+      "morning_cbm": 255.55,
+      "evening_cbm": 671.6,
+      "offpeak_cbm": 16039.0
+    },
+    {
+      "date": "2024-01-31",
+      "total_cbm": 17723.1,
+      "morning_cbm": 1247.01,
+      "evening_cbm": 951.86,
+      "offpeak_cbm": 15524.23
+    },
+    {
+      "date": "2024-02-01",
+      "total_cbm": 11291.37,
+      "morning_cbm": 423.26,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 10868.11
+    },
+    {
+      "date": "2024-02-02",
+      "total_cbm": 1115.76,
+      "morning_cbm": 284.28,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 831.48
+    },
+    {
+      "date": "2024-02-03",
+      "total_cbm": 1452.19,
+      "morning_cbm": 573.31,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 878.87
+    },
+    {
+      "date": "2024-02-04",
+      "total_cbm": 494.54,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 494.54
+    },
+    {
+      "date": "2024-02-05",
+      "total_cbm": 125.18,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 125.18
+    },
+    {
+      "date": "2024-02-11",
+      "total_cbm": 285.35,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 285.35
+    },
+    {
+      "date": "2024-02-12",
+      "total_cbm": 509.73,
+      "morning_cbm": 0.0,
+      "evening_cbm": 63.56,
+      "offpeak_cbm": 446.17
+    },
+    {
+      "date": "2024-02-13",
+      "total_cbm": 275.64,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 275.64
+    },
+    {
+      "date": "2024-02-14",
+      "total_cbm": 6.35,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 6.35
+    },
+    {
+      "date": "2024-02-15",
+      "total_cbm": 15.0,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 15.0
+    },
+    {
+      "date": "2024-02-16",
+      "total_cbm": 60.12,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 60.12
+    },
+    {
+      "date": "2024-02-17",
+      "total_cbm": 109.23,
+      "morning_cbm": 6.48,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 102.75
+    },
+    {
+      "date": "2024-02-18",
+      "total_cbm": 37.88,
+      "morning_cbm": 3.6,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 34.28
+    },
+    {
+      "date": "2024-02-19",
+      "total_cbm": 59.4,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 59.4
+    },
+    {
+      "date": "2024-02-20",
+      "total_cbm": 76.95,
+      "morning_cbm": 9.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 67.95
+    },
+    {
+      "date": "2024-02-21",
+      "total_cbm": 41.49,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 41.49
+    },
+    {
+      "date": "2024-02-22",
+      "total_cbm": 71.27,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 71.27
+    },
+    {
+      "date": "2024-02-23",
+      "total_cbm": 25.38,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 25.38
+    },
+    {
+      "date": "2024-02-24",
+      "total_cbm": 162.09,
+      "morning_cbm": 12.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 150.09
+    },
+    {
+      "date": "2024-02-25",
+      "total_cbm": 813.62,
+      "morning_cbm": 38.09,
+      "evening_cbm": 3.6,
+      "offpeak_cbm": 771.93
+    },
+    {
+      "date": "2024-02-26",
+      "total_cbm": 188.9,
+      "morning_cbm": 24.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 164.9
+    },
+    {
+      "date": "2024-02-27",
+      "total_cbm": 309.93,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 309.93
+    },
+    {
+      "date": "2024-02-28",
+      "total_cbm": 36.47,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 36.47
+    },
+    {
+      "date": "2024-02-29",
+      "total_cbm": 12.0,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 12.0
+    },
+    {
+      "date": "2024-03-01",
+      "total_cbm": 81.63,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 81.63
+    },
+    {
+      "date": "2024-03-02",
+      "total_cbm": 200.19,
+      "morning_cbm": 0.0,
+      "evening_cbm": 18.16,
+      "offpeak_cbm": 182.02
+    },
+    {
+      "date": "2024-03-03",
+      "total_cbm": 256.8,
+      "morning_cbm": 72.0,
+      "evening_cbm": 52.45,
+      "offpeak_cbm": 132.35
+    },
+    {
+      "date": "2024-03-04",
+      "total_cbm": 156.71,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 156.71
+    },
+    {
+      "date": "2024-03-05",
+      "total_cbm": 1250.21,
+      "morning_cbm": 11.4,
+      "evening_cbm": 216.0,
+      "offpeak_cbm": 1022.81
+    },
+    {
+      "date": "2024-03-06",
+      "total_cbm": 153.82,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 153.82
+    },
+    {
+      "date": "2024-03-07",
+      "total_cbm": 248.42,
+      "morning_cbm": 40.05,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 208.37
+    },
+    {
+      "date": "2024-03-08",
+      "total_cbm": 1401.31,
+      "morning_cbm": 171.45,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 1229.87
+    },
+    {
+      "date": "2024-03-09",
+      "total_cbm": 1825.61,
+      "morning_cbm": 361.87,
+      "evening_cbm": 316.15,
+      "offpeak_cbm": 1147.59
+    },
+    {
+      "date": "2024-03-10",
+      "total_cbm": 9895.75,
+      "morning_cbm": 1962.59,
+      "evening_cbm": 1094.22,
+      "offpeak_cbm": 6838.94
+    },
+    {
+      "date": "2024-03-11",
+      "total_cbm": 14603.42,
+      "morning_cbm": 855.29,
+      "evening_cbm": 1995.83,
+      "offpeak_cbm": 11752.31
+    },
+    {
+      "date": "2024-03-12",
+      "total_cbm": 9960.69,
+      "morning_cbm": 159.68,
+      "evening_cbm": 85.65,
+      "offpeak_cbm": 9715.35
+    },
+    {
+      "date": "2024-03-13",
+      "total_cbm": 14823.83,
+      "morning_cbm": 1220.23,
+      "evening_cbm": 1177.4,
+      "offpeak_cbm": 12426.2
+    },
+    {
+      "date": "2024-03-14",
+      "total_cbm": 22180.46,
+      "morning_cbm": 1723.66,
+      "evening_cbm": 1055.42,
+      "offpeak_cbm": 19401.39
+    },
+    {
+      "date": "2024-03-15",
+      "total_cbm": 19015.88,
+      "morning_cbm": 1190.45,
+      "evening_cbm": 411.07,
+      "offpeak_cbm": 17414.36
+    },
+    {
+      "date": "2024-03-16",
+      "total_cbm": 5254.57,
+      "morning_cbm": 286.55,
+      "evening_cbm": 709.18,
+      "offpeak_cbm": 4258.83
+    },
+    {
+      "date": "2024-03-17",
+      "total_cbm": 655.33,
+      "morning_cbm": 0.0,
+      "evening_cbm": 51.69,
+      "offpeak_cbm": 603.64
+    },
+    {
+      "date": "2024-03-18",
+      "total_cbm": 2837.3,
+      "morning_cbm": 79.59,
+      "evening_cbm": 204.6,
+      "offpeak_cbm": 2553.12
+    },
+    {
+      "date": "2024-03-19",
+      "total_cbm": 1717.37,
+      "morning_cbm": 90.78,
+      "evening_cbm": 24.0,
+      "offpeak_cbm": 1602.58
+    },
+    {
+      "date": "2024-03-20",
+      "total_cbm": 503.86,
+      "morning_cbm": 36.56,
+      "evening_cbm": 77.4,
+      "offpeak_cbm": 389.9
+    },
+    {
+      "date": "2024-03-21",
+      "total_cbm": 282.29,
+      "morning_cbm": 31.25,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 251.04
+    },
+    {
+      "date": "2024-03-22",
+      "total_cbm": 258.49,
+      "morning_cbm": 57.6,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 200.89
+    },
+    {
+      "date": "2024-03-23",
+      "total_cbm": 112.92,
+      "morning_cbm": 0.0,
+      "evening_cbm": 41.66,
+      "offpeak_cbm": 71.26
+    },
+    {
+      "date": "2024-03-24",
+      "total_cbm": 18.0,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 18.0
+    },
+    {
+      "date": "2024-03-25",
+      "total_cbm": 18.97,
+      "morning_cbm": 5.46,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 13.51
+    },
+    {
+      "date": "2024-03-26",
+      "total_cbm": 5.4,
+      "morning_cbm": 5.4,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 0.0
+    },
+    {
+      "date": "2024-03-27",
+      "total_cbm": 5.45,
+      "morning_cbm": 5.45,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 0.0
+    },
+    {
+      "date": "2024-03-29",
+      "total_cbm": 12.0,
+      "morning_cbm": 0.0,
+      "evening_cbm": 0.0,
+      "offpeak_cbm": 12.0
+    }
+  ]
+}

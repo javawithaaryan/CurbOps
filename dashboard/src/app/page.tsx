@@ -12,8 +12,9 @@ import Sidebar from '@/components/dashboard/Sidebar';
 import TopBar from '@/components/dashboard/TopBar';
 import DrillDownPanel from '@/components/dashboard/DrillDownPanel';
 import PriorityTable from '@/components/dashboard/PriorityTable';
+import CityTrendsPanel from '@/components/dashboard/CityTrendsPanel';
 import { DEPLOYABLE_TIERS } from '@/lib/dashboard/tiers';
-import type { CityStats, Zone } from '@/lib/dashboard/types';
+import type { AnalyticsPayload, CityStats, Zone } from '@/lib/dashboard/types';
 
 // Leaflet must only render on the client.
 const MapView = dynamic(() => import('@/components/dashboard/MapView'), {
@@ -28,10 +29,11 @@ const MapView = dynamic(() => import('@/components/dashboard/MapView'), {
 export default function Home() {
   const [zones, setZones] = useState<Zone[]>([]);
   const [stats, setStats] = useState<CityStats | null>(null);
+  const [analytics, setAnalytics] = useState<AnalyticsPayload | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [view, setView] = useState<'map' | 'table'>('map');
+  const [view, setView] = useState<'map' | 'table' | 'trends'>('map');
   const [selectedZone, setSelectedZone] = useState<Zone | null>(null);
   const [hideLowConfidence, setHideLowConfidence] = useState(false);
   const [simulate, setSimulate] = useState(false);
@@ -42,12 +44,21 @@ export default function Home() {
     let cancelled = false;
     (async () => {
       try {
-        const [zRes, sRes] = await Promise.all([fetch('/api/zones'), fetch('/api/stats')]);
+        const [zRes, sRes, aRes] = await Promise.all([
+          fetch('/api/zones'),
+          fetch('/api/stats'),
+          fetch('/api/analytics'),
+        ]);
         if (!zRes.ok || !sRes.ok) throw new Error('API request failed');
-        const [z, s] = await Promise.all([zRes.json() as Promise<Zone[]>, sRes.json() as Promise<CityStats>]);
+        const [z, s, a] = await Promise.all([
+          zRes.json() as Promise<Zone[]>,
+          sRes.json() as Promise<CityStats>,
+          aRes.json() as Promise<AnalyticsPayload>,
+        ]);
         if (cancelled) return;
         setZones(z);
         setStats(s);
+        setAnalytics(a);
         setLoading(false);
       } catch (e) {
         if (cancelled) return;
@@ -181,6 +192,8 @@ export default function Home() {
                 <DrillDownPanel zone={selectedZone} onClose={() => setSelectedZone(null)} simulate={simulate} />
               )}
             </>
+          ) : view === 'trends' ? (
+            <CityTrendsPanel daily={analytics?.daily ?? []} />
           ) : (
             <PriorityTable zones={filteredZones} onRowClick={handleSelectFromTable} stationFilter={stationFilter} />
           )}
