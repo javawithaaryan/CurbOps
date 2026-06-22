@@ -2,7 +2,7 @@
 
 // ---------------------------------------------------------------------------
 // CurbOps — MapView
-// Full-bleed map with geographic <Circle> markers coloured by action_tier.
+// Full-bleed map with geographic <Circle> markers colored by action_tier.
 // Basemap strategy: CartoDB Dark Matter with fallback to Light and Satellite.
 // ---------------------------------------------------------------------------
 
@@ -11,7 +11,7 @@ import { MapContainer, TileLayer, Circle, Tooltip, useMap, Marker, Popup, Polyli
 import L from 'leaflet';
 import type { LatLngExpression } from 'leaflet';
 import { getJunctionDisplayName, parseWindow } from '@/lib/dashboard/tiers';
-import MapSearch, { type PlaceResult } from './MapSearch';
+import { type PlaceResult } from './MapSearch';
 import {
   TIER_COLORS,
   TIER_FILL_OPACITY,
@@ -120,18 +120,61 @@ function PlaceFlyToController({ place }: { place: PlaceResult | null }) {
   return null;
 }
 
-// Recenter + reset controls
+// Fit map bounds to all stations when stationFilter === 'ALL'
+function MapResetController({
+  stationFilter,
+  allZones,
+}: {
+  stationFilter: string;
+  allZones: Zone[];
+}) {
+  const map = useMap();
+  const prevFilterRef = useRef(stationFilter);
+
+  useEffect(() => {
+    if (stationFilter === 'ALL' && prevFilterRef.current !== 'ALL') {
+      if (allZones.length > 0) {
+        const points = allZones.map((z) => [z.centroid_lat, z.centroid_lon] as [number, number]);
+        const bounds = L.latLngBounds(points);
+        map.fitBounds(bounds, {
+          padding: [80, 80],
+          animate: true,
+          duration: 0.9,
+        });
+      }
+    }
+    prevFilterRef.current = stationFilter;
+  }, [stationFilter, allZones, map]);
+
+  return null;
+}
+
+// Recenter, Reset + Zoom custom controls (styled dark glass, small radius, blue border, hover glow)
 function MapControls({ onReset }: { onReset: () => void }) {
   const map = useMap();
   return (
-    <div className="absolute bottom-6 right-3 z-[500] flex flex-col gap-2">
+    <div className="absolute bottom-8 right-5 z-[500] flex flex-col gap-2">
+      <button
+        onClick={() => map.zoomIn()}
+        className="w-9 h-9 rounded bg-[#071022]/92 border border-[rgba(80,140,255,0.18)] text-[#DDE8FF] hover:text-[#22d3ee] hover:border-[#508cff]/40 shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-[0_0_8px_rgba(80,140,255,0.25)] flex items-center justify-center transition cursor-pointer font-bold text-lg"
+        title="Zoom In"
+      >
+        +
+      </button>
+      <button
+        onClick={() => map.zoomOut()}
+        className="w-9 h-9 rounded bg-[#071022]/92 border border-[rgba(80,140,255,0.18)] text-[#DDE8FF] hover:text-[#22d3ee] hover:border-[#508cff]/40 shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-[0_0_8px_rgba(80,140,255,0.25)] flex items-center justify-center transition cursor-pointer font-bold text-lg"
+        title="Zoom Out"
+      >
+        −
+      </button>
       <button
         onClick={() =>
           map.flyTo(BENGALURU_CENTER as LatLngExpression, BENGALURU_ZOOM, {
             duration: 0.7,
           })
         }
-        className="w-9 h-9 rounded-md glass-dark text-slate-200 hover:text-[#22d3ee] flex items-center justify-center transition"
+        className="w-9 h-9 rounded bg-[#071022]/92 border border-[rgba(80,140,255,0.18)] text-[#DDE8FF] hover:text-[#22d3ee] hover:border-[#508cff]/40 shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-[0_0_8px_rgba(80,140,255,0.25)] flex items-center justify-center transition cursor-pointer"
         title="Recenter on Bengaluru"
       >
         <svg viewBox="0 0 16 16" width="16" height="16" fill="none">
@@ -147,7 +190,7 @@ function MapControls({ onReset }: { onReset: () => void }) {
       </button>
       <button
         onClick={onReset}
-        className="w-9 h-9 rounded-md glass-dark text-slate-200 hover:text-[#22d3ee] flex items-center justify-center transition"
+        className="w-9 h-9 rounded bg-[#071022]/92 border border-[rgba(80,140,255,0.18)] text-[#DDE8FF] hover:text-[#22d3ee] hover:border-[#508cff]/40 shadow-[0_4px_12px_rgba(0,0,0,0.5)] hover:shadow-[0_0_8px_rgba(80,140,255,0.25)] flex items-center justify-center transition cursor-pointer"
         title="Reset view"
       >
         <svg viewBox="0 0 16 16" width="16" height="16" fill="none">
@@ -172,7 +215,7 @@ function MapControls({ onReset }: { onReset: () => void }) {
   );
 }
 
-// Basemap switcher
+// Floating basemap switcher (premium glass style override)
 function BasemapSwitcher({
   current,
   onChange,
@@ -181,22 +224,29 @@ function BasemapSwitcher({
   onChange: (k: BasemapKey) => void;
 }) {
   return (
-    <div className="absolute top-3 right-3 z-[500] glass-dark rounded-md flex overflow-hidden">
+    <div
+      className="rounded-xl flex overflow-hidden border border-[rgba(80,140,255,0.18)] h-11 items-center transition-all duration-150"
+      style={{
+        background: 'rgba(7, 18, 40, 0.88)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+      }}
+    >
       {BASEMAPS.map((bm) => {
         const active = bm.key === current;
         return (
           <button
             key={bm.key}
             onClick={() => onChange(bm.key)}
-            className={`px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider transition flex items-center gap-1.5 ${
+            className={`px-3.5 h-full text-[10px] font-mono uppercase tracking-wider transition-all duration-150 flex items-center gap-1.5 cursor-pointer ${
               active
-                ? 'bg-white/15 text-white'
-                : 'text-slate-300 hover:text-white hover:bg-white/5'
+                ? 'bg-white/10 text-white font-bold'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'
             }`}
             title={`Switch basemap to ${bm.label}`}
           >
             <span
-              className="w-1.5 h-1.5 rounded-full"
+              className="w-1.5 h-1.5 rounded-full animate-pulse"
               style={{
                 background: bm.color,
                 boxShadow: active ? `0 0 6px ${bm.color}` : 'none',
@@ -212,23 +262,49 @@ function BasemapSwitcher({
 
 interface MapViewProps {
   zones: Zone[];
+  allZones: Zone[];
   simulate: boolean;
   onSelect: (z: Zone) => void;
   selectedZone: Zone | null;
   flyToZone: { lat: number; lon: number; radius_m: number } | null;
+  setStationFilter: (station: string) => void;
+  stationFilter: string;
+  showCbmSize: boolean;
+  showPatrolRoute: boolean;
+  placeResult: PlaceResult | null;
+  setPlaceResult: (p: PlaceResult | null) => void;
 }
 
 export default function MapView({
   zones,
+  allZones,
   simulate,
   onSelect,
   selectedZone,
   flyToZone,
+  setStationFilter,
+  stationFilter,
+  showCbmSize,
+  showPatrolRoute,
+  placeResult,
+  setPlaceResult,
 }: MapViewProps) {
   const mapRef = useRef<{ flyTo: (c: LatLngExpression, z: number, opts?: unknown) => void } | null>(null);
   const [basemap, setBasemap] = useState<BasemapKey>('dark');
-  const [placeResult, setPlaceResult] = useState<PlaceResult | null>(null);
-  const [searchOpen, setSearchOpen] = useState(false);
+
+  // Deployment expanded/collapsed state (persisted)
+  const [deploymentExpanded, setDeploymentExpanded] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('curbops_deployment_expanded');
+      return saved === 'true';
+    }
+    return false; // Default collapsed
+  });
+
+  const toggleDeploymentExpanded = (val: boolean) => {
+    setDeploymentExpanded(val);
+    localStorage.setItem('curbops_deployment_expanded', String(val));
+  };
 
   // Compute Patrol Deployment Plan Route (TOW priority zones sorted by priority score desc)
   const routeZones = useMemo(() => {
@@ -271,7 +347,7 @@ export default function MapView({
         zoom={BENGALURU_ZOOM}
         minZoom={10}
         maxZoom={18}
-        zoomControl={true}
+        zoomControl={false} // Custom controls positioning active
         attributionControl={true}
         className="h-full w-full"
         ref={(m) => {
@@ -310,6 +386,7 @@ export default function MapView({
 
         <FlyToController flyToZone={flyToZone} />
         <PlaceFlyToController place={placeResult} />
+        <MapResetController stationFilter={stationFilter} allZones={allZones} />
 
         {/* Temporary Search Result Pin */}
         {placeResult && (
@@ -319,14 +396,13 @@ export default function MapView({
             eventHandlers={{ add: (e) => e.target.openPopup() }}
           >
             <Popup className="curbops-place-popup">
-              <div className="space-y-0.5 font-mono">
-                <div className="font-semibold text-[12px] text-white">
-                  {placeResult.label}
+              <div className="space-y-1 text-[11px] text-[#DDE8FF] font-mono">
+                <div className="text-[9px] uppercase tracking-wider text-[#22d3ee] font-bold border-b border-cyan-500/20 pb-0.5">
+                  SEARCH MATCH
                 </div>
+                <div className="font-semibold">{placeResult.label}</div>
                 {placeResult.detail && (
-                  <div className="text-[10px] text-slate-300">
-                    {placeResult.detail}
-                  </div>
+                  <div className="text-[10px] text-slate-300">{placeResult.detail}</div>
                 )}
                 <div className="text-[9px] text-[#22d3ee] uppercase tracking-wider">
                   {placeResult.lat.toFixed(4)}°, {placeResult.lon.toFixed(4)}°
@@ -340,17 +416,36 @@ export default function MapView({
         {zones.map((z) => {
           const tier: ActionTier = z.action_tier || 'MONITOR';
           const palette = TIER_COLORS[tier] || TIER_COLORS.MONITOR;
-          const radius = Math.max(8, z.radius_m || 20);
+          const radius = showCbmSize ? Math.max(8, z.radius_m || 20) : 15;
           const isSelected = selectedZone && selectedZone.zone_id === z.zone_id;
 
+          const isInactive = selectedZone !== null && !isSelected;
           const isDeployable = tier === 'TOW' || tier === 'PATROL';
-          const fillOpacity = simulate
-            ? isDeployable
-              ? TIER_FILL_OPACITY.simulateDeployable
-              : TIER_FILL_OPACITY.simulateMonitor
-            : isSelected
-              ? TIER_FILL_OPACITY.selected
-              : TIER_FILL_OPACITY.normal;
+
+          // Visual Hierarchy logic overrides (Selected: 95%, Tow: 80%, Patrol: 75%, Monitor: 55%, Inactive background: 25%)
+          let fillOpacity = isSelected 
+            ? 0.95
+            : tier === 'TOW' 
+              ? 0.8 
+              : tier === 'PATROL' 
+                ? 0.75 
+                : 0.55;
+
+          if (isInactive) {
+            fillOpacity = 0.25; // Background clusters 25%
+          }
+
+          let strokeOpacity = isSelected 
+            ? 0.95 
+            : tier === 'TOW' 
+              ? 0.8 
+              : tier === 'PATROL' 
+                ? 0.75 
+                : 0.55;
+
+          if (isInactive) {
+            strokeOpacity = 0.25; // Background clusters 25%
+          }
 
           return (
             <Fragment key={z.zone_id}>
@@ -364,7 +459,7 @@ export default function MapView({
                     weight: 0,
                     opacity: 0,
                     fillColor: palette.fill,
-                    fillOpacity: TIER_FILL_OPACITY.halo,
+                    fillOpacity: isInactive ? TIER_FILL_OPACITY.halo * 0.25 : TIER_FILL_OPACITY.halo,
                     interactive: false,
                   }}
                 />
@@ -377,19 +472,19 @@ export default function MapView({
                 pathOptions={basemap === 'satellite' ? {
                   color: '#ffffff',
                   weight: isSelected ? 2 : 1,
-                  opacity: isSelected ? 1 : 0.8,
+                  opacity: isSelected ? 0.95 : (isInactive ? 0.25 : 0.8),
                   fillColor: palette.fill,
-                  fillOpacity: isSelected ? 0.9 : (simulate ? (isDeployable ? 0.85 : 0.15) : 0.75),
+                  fillOpacity: isSelected ? 0.95 : (simulate ? (isDeployable ? 0.85 : 0.15) : (isInactive ? 0.15 : fillOpacity)),
                 } : basemap === 'light' ? {
                   color: palette.stroke,
                   weight: isSelected ? 2 : 1,
-                  opacity: isSelected ? 1 : 0.7,
+                  opacity: isSelected ? 0.95 : (isInactive ? 0.15 : strokeOpacity),
                   fillColor: palette.fill,
-                  fillOpacity: isSelected ? 0.9 : (simulate ? (isDeployable ? 0.85 : 0.15) : 0.75),
+                  fillOpacity: isSelected ? 0.95 : (simulate ? (isDeployable ? 0.85 : 0.15) : (isInactive ? 0.15 : fillOpacity)),
                 } : {
                   color: palette.stroke,
                   weight: isSelected ? TIER_STROKE.weightSelected : TIER_STROKE.weight,
-                  opacity: isSelected ? TIER_STROKE.opacitySelected : TIER_STROKE.opacity,
+                  opacity: isSelected ? TIER_STROKE.opacitySelected : strokeOpacity,
                   fillColor: palette.fill,
                   fillOpacity,
                 }}
@@ -422,7 +517,7 @@ export default function MapView({
         })}
 
         {/* Suggested Route Polyline */}
-        {routeZones.length >= 2 && startStationCoordinate && (
+        {showPatrolRoute && stationFilter !== 'ALL' && routeZones.length >= 2 && startStationCoordinate && (
           <Polyline
             positions={[
               startStationCoordinate,
@@ -431,7 +526,7 @@ export default function MapView({
             pathOptions={{
               color: '#dc2626',
               weight: 3.5,
-              opacity: 0.85,
+              opacity: selectedZone ? 0.3 : 1.0, // Selected route 100%
               dashArray: '8, 8',
               className: 'animated-patrol-route',
             }}
@@ -439,18 +534,27 @@ export default function MapView({
         )}
 
         {/* Station Start HQ Indicator */}
-        {routeZones.length > 0 && startStationCoordinate && (
+        {showPatrolRoute && stationFilter !== 'ALL' && routeZones.length > 0 && startStationCoordinate && (
           <Marker
             position={startStationCoordinate as LatLngExpression}
             icon={createStationStartIcon() as L.DivIcon}
           >
             <Popup className="curbops-place-popup">
-              <div className="space-y-0.5 font-mono">
-                <div className="font-semibold text-[11px] text-white">
-                  <span className="text-[#3b82f6] font-bold">Route HQ:</span> {routeZones[0].police_station} Police Station
+              <div className="space-y-1.5 text-[11px] text-[#DDE8FF] font-mono">
+                <div className="text-[9px] uppercase tracking-wider text-[#3b82f6] font-bold border-b border-blue-500/20 pb-0.5">
+                  ROUTE HQ
                 </div>
-                <div className="text-[10px] text-slate-300">
-                  Origin point for the Patrol Deployment Plan.
+                <div>
+                  <span className="text-[#6E7F9E]">Station:</span> BTP{String(routeZones[0].zone_id).padStart(3, '0')}
+                </div>
+                <div>
+                  <span className="text-[#6E7F9E]">Coverage:</span> {routeZones.length} Zones
+                </div>
+                <div>
+                  <span className="text-[#6E7F9E]">Recovery:</span> {Math.round(expectedRouteRecovery).toLocaleString('en-IN')} CBM
+                </div>
+                <div>
+                  <span className="text-[#6E7F9E]">Status:</span> <span className="text-emerald-400 font-bold">ACTIVE</span>
                 </div>
               </div>
             </Popup>
@@ -458,7 +562,7 @@ export default function MapView({
         )}
 
         {/* Suggested Enforcement Route Stop Markers */}
-        {routeZones.map((z, idx) => {
+        {showPatrolRoute && stationFilter !== 'ALL' && routeZones.map((z, idx) => {
           const icon = createRouteStopIcon(idx);
           if (!icon) return null;
           return (
@@ -468,15 +572,16 @@ export default function MapView({
               icon={icon}
             >
               <Popup className="curbops-place-popup">
-                <div className="space-y-0.5 font-mono">
-                  <div className="font-semibold text-[11px] text-white">
-                    <span className="text-red-400 font-bold">Stop #{idx + 1}:</span> {getJunctionDisplayName(z)}
+                <div className="space-y-1 text-[11px] text-[#DDE8FF]">
+                  <div className="text-[9px] uppercase tracking-wider text-red-400 font-bold border-b border-red-500/20 pb-0.5">
+                    STOP #{idx + 1}
                   </div>
-                  <div className="text-[10px] text-slate-300">
-                    Priority Score: {Math.round(z.priority_score).toLocaleString('en-IN')}
+                  <div className="font-semibold">{getJunctionDisplayName(z)}</div>
+                  <div>
+                    <span className="text-[#6E7F9E]">Priority:</span> {Math.round(z.priority_score)}
                   </div>
-                  <div className="text-[9px] text-[#22d3ee] uppercase tracking-wider">
-                    Window: {z.recommended_window}
+                  <div>
+                    <span className="text-[#6E7F9E]">Window:</span> {z.recommended_window}
                   </div>
                 </div>
               </Popup>
@@ -495,71 +600,102 @@ export default function MapView({
         />
       </MapContainer>
 
-      {/* Place search slot (dataset-driven autocomplete) */}
-      <div className="absolute top-3 left-14 z-[600] w-72 max-w-xs">
-        <MapSearch zones={zones} onSelect={(p) => {
-          setPlaceResult(p);
-          onSelect(p.zone);
-        }} onOpenChange={setSearchOpen} />
-      </div>
+      {/* Grid container aligning left floater (Patrol Deployment) and right floater (MapStyle) */}
+      <div className="absolute top-3 left-3 right-3 z-[600] flex justify-between items-start pointer-events-none">
+        
+        {/* Left floater: Collapsible Patrol Deployment Plan */}
+        <div className="pointer-events-auto flex-shrink-0">
+          {routeZones.length > 0 && (
+            <>
+              {/* Collapsed view */}
+              {!deploymentExpanded && (
+                <button
+                  onClick={() => toggleDeploymentExpanded(true)}
+                  className="w-[220px] h-[48px] glass-dark rounded-lg px-3 py-2 text-slate-200 border border-red-500/20 shadow-[0_8px_32px_rgba(0,0,0,0.5)] transition-all duration-200 hover:border-red-500/40 text-left font-mono flex flex-col justify-between cursor-pointer"
+                >
+                  <div className="text-[11px] tracking-wider uppercase font-bold text-red-400 flex items-center gap-1.5 leading-none">
+                    <span>🚓</span> Patrol Deployment
+                  </div>
+                  <div className="text-[9px] text-slate-400 leading-none flex justify-between">
+                    <span>Shift: {shift}</span>
+                    <span>{routeZones.length} Zones</span>
+                  </div>
+                </button>
+              )}
 
-      {/* Patrol Deployment Plan Route Card */}
-      {routeZones.length > 0 && (
-        <div
-          className="absolute left-3 z-[600] w-[320px] glass-dark rounded-lg p-3 text-slate-200 border border-red-500/30 shadow-[0_8px_32px_rgba(0,0,0,0.5)] animate-slideIn transition-all duration-300 font-mono"
-          style={{ top: searchOpen ? '380px' : '60px' }}
-        >
-          <div className="flex items-center justify-between mb-2 border-b border-red-500/20 pb-1.5">
-            <span className="text-[11px] tracking-wider uppercase font-semibold text-red-400 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-              Patrol Deployment Plan
-            </span>
-            <span className="text-[9px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-300 uppercase tracking-widest border border-red-500/20 font-semibold">
-              TOW OPS
-            </span>
-          </div>
-          <div className="grid grid-cols-2 gap-1.5 text-xs mb-2">
-            <div className="bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
-              <div className="text-[9px] text-slate-500 uppercase tracking-wider">Shift</div>
-              <div className="font-semibold text-slate-200 mt-0.5">{shift}</div>
-            </div>
-            <div className="bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
-              <div className="text-[9px] text-slate-500 uppercase tracking-wider">Stops</div>
-              <div className="font-semibold text-slate-200 mt-0.5">{routeZones.length} Zones</div>
-            </div>
-            <div className="col-span-2 bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
-              <div className="text-[9px] text-slate-500 uppercase tracking-wider">Estimated Window</div>
-              <div className="font-semibold text-red-400 mt-0.5">{estimatedWindow}</div>
-            </div>
-            <div className="col-span-2 bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
-              <div className="text-[9px] text-slate-500 uppercase tracking-wider">Expected Recovery</div>
-              <div className="font-semibold text-emerald-300 mt-0.5">{Math.round(expectedRouteRecovery).toLocaleString('en-IN')} CBM</div>
-            </div>
-          </div>
-          {/* Stops List */}
-          <div className="space-y-1 max-h-[120px] overflow-y-auto scroll-thin border-t border-slate-800/40 pt-1.5">
-            {routeZones.map((z, idx) => (
-              <button
-                key={z.zone_id}
-                onClick={() => {
-                  onSelect(z);
-                  (mapRef.current as any)?.flyTo?.([z.centroid_lat, z.centroid_lon], 16, { duration: 0.8 });
-                }}
-                className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-white/5 text-[10px] text-left transition"
-              >
-                <span className="truncate pr-2 text-slate-300">
-                  <strong className="text-red-400 pr-1">#{idx + 1}</strong> {getJunctionDisplayName(z)}
-                </span>
-                <span className="text-[9px] text-slate-500 flex-shrink-0">
-                  Score: {Math.round(z.priority_score)}
-                </span>
-              </button>
-            ))}
-          </div>
+              {/* Expanded view */}
+              {deploymentExpanded && (
+                <div
+                  className="w-[320px] glass-dark rounded-lg p-3 text-slate-200 border border-red-500/30 shadow-[0_8px_32px_rgba(0,0,0,0.5)] animate-slideIn transition-all duration-300 font-mono"
+                >
+                  <div className="flex items-center justify-between mb-2 border-b border-red-500/20 pb-1.5">
+                    <span className="text-[11px] tracking-wider uppercase font-semibold text-red-400 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                      Patrol Deployment Plan
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[9px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-300 uppercase tracking-widest border border-red-500/20 font-semibold">
+                        TOW OPS
+                      </span>
+                      <button
+                        onClick={() => toggleDeploymentExpanded(false)}
+                        className="text-slate-400 hover:text-slate-200 transition text-[10px] px-1 cursor-pointer"
+                        title="Collapse Panel"
+                      >
+                        ◀
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5 text-xs mb-2">
+                    <div className="bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
+                      <div className="text-[9px] text-slate-500 uppercase tracking-wider">Shift</div>
+                      <div className="font-semibold text-slate-200 mt-0.5">{shift}</div>
+                    </div>
+                    <div className="bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
+                      <div className="text-[9px] text-slate-500 uppercase tracking-wider">Stops</div>
+                      <div className="font-semibold text-slate-200 mt-0.5">{routeZones.length} Zones</div>
+                    </div>
+                    <div className="col-span-2 bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
+                      <div className="text-[9px] text-slate-500 uppercase tracking-wider">Estimated Window</div>
+                      <div className="font-semibold text-red-400 mt-0.5">{estimatedWindow}</div>
+                    </div>
+                    <div className="col-span-2 bg-slate-950/40 rounded px-2.5 py-1.5 border border-slate-800/40">
+                      <div className="text-[9px] text-slate-500 uppercase tracking-wider">Expected Recovery</div>
+                      <div className="font-semibold text-emerald-300 mt-0.5">{Math.round(expectedRouteRecovery).toLocaleString('en-IN')} CBM</div>
+                    </div>
+                  </div>
+                  {/* Stops List */}
+                  <div className="space-y-1 max-h-[120px] overflow-y-auto scroll-thin border-t border-slate-800/40 pt-1.5">
+                    {routeZones.map((z, idx) => (
+                      <button
+                        key={z.zone_id}
+                        onClick={() => {
+                          onSelect(z);
+                          (mapRef.current as any)?.flyTo?.([z.centroid_lat, z.centroid_lon], 16, { duration: 0.8 });
+                        }}
+                        className="w-full flex items-center justify-between px-2 py-1 rounded hover:bg-white/5 text-[10px] text-left transition cursor-pointer"
+                      >
+                        <span className="truncate pr-2 text-slate-300">
+                          <strong className="text-red-400 pr-1">#{idx + 1}</strong> {getJunctionDisplayName(z)}
+                        </span>
+                        <span className="text-[9px] text-slate-500 flex-shrink-0">
+                          Score: {Math.round(z.priority_score)}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
-      )}
 
-      <BasemapSwitcher current={basemap} onChange={setBasemap} />
+        {/* Right floater: Basemap Style Switcher (re-styled & floating on map) */}
+        <div className="pointer-events-auto flex-shrink-0">
+          <BasemapSwitcher current={basemap} onChange={setBasemap} />
+        </div>
+
+      </div>
 
       <div className="map-brand-badge font-mono">
         <div className="glass-dark rounded-md px-2.5 py-1.5 flex items-center gap-2">

@@ -7,6 +7,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { type PlaceResult } from '@/components/dashboard/MapSearch';
 
 import Sidebar from '@/components/dashboard/Sidebar';
 import TopBar from '@/components/dashboard/TopBar';
@@ -45,6 +46,9 @@ export default function Home() {
   const [simulate, setSimulate] = useState(false);
   const [stationFilter, setStationFilter] = useState('ALL');
   const [flyToZone, setFlyToZone] = useState<{ lat: number; lon: number; radius_m: number } | null>(null);
+  const [showCbmSize, setShowCbmSize] = useState(true);
+  const [showPatrolRoute, setShowPatrolRoute] = useState(true);
+  const [placeResult, setPlaceResult] = useState<PlaceResult | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -115,7 +119,12 @@ export default function Home() {
   // immediately sees the relevant area.
   // -------------------------------------------------------------------
   useEffect(() => {
-    if (stationFilter === 'ALL') return;
+    if (stationFilter === 'ALL') {
+      setSelectedZone(null);
+      setFlyToZone(null);
+      setPlaceResult(null);
+      return;
+    }
     // Find the highest-CBM zone for this station (the source data is sorted
     // by CBM desc in the source dataset, so the first match is the worst).
     const target = filteredZones.find((z) => z.police_station === stationFilter);
@@ -189,6 +198,15 @@ export default function Home() {
           totalCount={zones.length}
           view={view}
           stationFilter={stationFilter}
+          setStationFilter={setStationFilter}
+          zones={zones}
+          onSelectZone={setSelectedZone}
+          showCbmSize={showCbmSize}
+          setShowCbmSize={setShowCbmSize}
+          showPatrolRoute={showPatrolRoute}
+          setShowPatrolRoute={setShowPatrolRoute}
+          setPlaceResult={setPlaceResult}
+          placeResult={placeResult}
         />
 
         <div className="flex-1 relative min-h-0">
@@ -196,10 +214,17 @@ export default function Home() {
             <>
               <MapView
                 zones={visibleZones}
+                allZones={zones}
                 simulate={simulate}
                 onSelect={setSelectedZone}
                 selectedZone={selectedZone}
                 flyToZone={flyToZone}
+                setStationFilter={setStationFilter}
+                stationFilter={stationFilter}
+                showCbmSize={showCbmSize}
+                showPatrolRoute={showPatrolRoute}
+                placeResult={placeResult}
+                setPlaceResult={setPlaceResult}
               />
               {selectedZone && (
                 <DrillDownPanel zone={selectedZone} onClose={() => setSelectedZone(null)} simulate={simulate} />

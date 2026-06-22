@@ -2,23 +2,24 @@
 venv/
 env/
 .venv/
-.evn
+
+# Environment files
+.env
+.env.local
+.env*.local
 
 # Python cache
 __pycache__/
 *.py[cod]
 *$py.class
 
-# Large Datasets (Do NOT push to GitHub)
+# Large datasets
 dataset/*.csv
-dataset/jan*
-*.csv
 mmi_cache.json
 
-# Secrets / credentials (NEVER commit)
+# Secrets
 secrets.txt
 **/secrets.txt
-
 
 # IDEs
 .vscode/
@@ -33,5 +34,12 @@ node_modules/
 
 # Archives
 *.zip
+
+# Local folders
 dashboard_an/
-nul
+
+# Logs
+*.log
+
+# Crash dumps
+*.stackdump

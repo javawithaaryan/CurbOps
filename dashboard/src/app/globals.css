@@ -262,18 +262,26 @@ body {
   font-family: 'Inter', system-ui, sans-serif;
 }
 .leaflet-control-zoom a {
-  background: rgba(15, 23, 42, 0.92) !important;
-  color: #e2e8f0 !important;
-  border-color: rgba(59, 130, 246, 0.25) !important;
-  font-weight: 600;
+  background: rgba(7, 16, 34, 0.92) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  color: #DDE8FF !important;
+  border: 1px solid rgba(80, 140, 255, 0.18) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-weight: bold;
+  transition: all 180ms ease-out !important;
 }
 .leaflet-control-zoom a:hover {
-  background: rgba(30, 41, 59, 0.95) !important;
+  background: rgba(11, 22, 44, 0.96) !important;
   color: #22d3ee !important;
+  border-color: rgba(80, 140, 255, 0.45) !important;
+  box-shadow: 0 0 8px rgba(80, 140, 255, 0.25) !important;
 }
 .leaflet-bar {
-  border: 1px solid rgba(59, 130, 246, 0.2) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  border: none !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 4px !important;
+  overflow: hidden !important;
 }
 .leaflet-tooltip.curbops-tooltip {
   background-color: rgba(15, 23, 42, 0.95); /* slate-900 */
@@ -295,6 +303,37 @@ body {
 }
 .leaflet-control-attribution a {
   color: #94a3b8 !important;
+}
+
+/* Custom tactical Leaflet popup styles */
+.leaflet-popup-content-wrapper {
+  background: rgba(7, 16, 34, 0.96) !important;
+  color: #DDE8FF !important;
+  border: 1px solid rgba(59, 130, 246, 0.35) !important;
+  border-radius: 4px !important;
+  font-family: 'JetBrains Mono', ui-monospace, monospace !important;
+  font-size: 11px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6) !important;
+  padding: 1px !important;
+}
+
+.leaflet-popup-content {
+  margin: 10px 12px !important;
+  line-height: 1.4 !important;
+}
+
+.leaflet-popup-tip {
+  background: rgba(7, 16, 34, 0.96) !important;
+  border-left: 1px solid rgba(59, 130, 246, 0.35) !important;
+  border-bottom: 1px solid rgba(59, 130, 246, 0.35) !important;
+}
+
+.leaflet-popup-close-button {
+  color: #6E7F9E !important;
+  padding: 6px 6px 0 0 !important;
+}
+.leaflet-popup-close-button:hover {
+  color: #22d3ee !important;
 }
 
 /* Toggle switch */
